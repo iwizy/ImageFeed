@@ -48,16 +48,6 @@
 			path = ImageFeed;
 			sourceTree = "<group>";
 		};
-		8402B3E32D8CA7FE001842E4 /* ImageFeedTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = ImageFeedTests;
-			sourceTree = "<group>";
-		};
-		8402B3ED2D8CA7FE001842E4 /* ImageFeedUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = ImageFeedUITests;
-			sourceTree = "<group>";
-		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -89,8 +79,6 @@
 			isa = PBXGroup;
 			children = (
 				8402B3CC2D8CA7FC001842E4 /* ImageFeed */,
-				8402B3E32D8CA7FE001842E4 /* ImageFeedTests */,
-				8402B3ED2D8CA7FE001842E4 /* ImageFeedUITests */,
 				8402B3CB2D8CA7FC001842E4 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -143,9 +131,6 @@
 			dependencies = (
 				8402B3E22D8CA7FE001842E4 /* PBXTargetDependency */,
 			);
-			fileSystemSynchronizedGroups = (
-				8402B3E32D8CA7FE001842E4 /* ImageFeedTests */,
-			);
 			name = ImageFeedTests;
 			packageProductDependencies = (
 			);
@@ -165,9 +150,6 @@
 			);
 			dependencies = (
 				8402B3EC2D8CA7FE001842E4 /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				8402B3ED2D8CA7FE001842E4 /* ImageFeedUITests */,
 			);
 			name = ImageFeedUITests;
 			packageProductDependencies = (

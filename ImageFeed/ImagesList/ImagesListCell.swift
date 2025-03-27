@@ -2,8 +2,7 @@
 //  ImagesListCell.swift
 //  ImageFeed
 //
-//  Created by Alexander Agafonov on 25.03.2025.
-//
+// Класс кастомной ячейки
 
 import UIKit
 

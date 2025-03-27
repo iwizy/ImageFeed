@@ -2,8 +2,7 @@
 //  ViewController.swift
 //  ImageFeed
 //
-//  Created by Alexander Agafonov on 20.03.2025.
-//
+//  Основной класс вью контроллера
 
 import UIKit
 
