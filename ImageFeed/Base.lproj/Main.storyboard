@@ -92,11 +92,42 @@
                     <navigationItem key="navigationItem" id="Lna-Nd-7IB"/>
                     <connections>
                         <outlet property="tableView" destination="ABn-Vs-POi" id="Wqk-rU-dG0"/>
+                        <segue destination="gpT-9k-QYJ" kind="show" identifier="ShowSingleImage" id="Kly-8y-egU"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="1061.8320610687022" y="3.5211267605633805"/>
+        </scene>
+        <!--Single Image View Controller-->
+        <scene sceneID="3Lt-i5-hGw">
+            <objects>
+                <viewController id="gpT-9k-QYJ" customClass="SingleImageViewController" customModule="ImageFeed" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="UYP-Gq-67v">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="0" translatesAutoresizingMaskIntoConstraints="NO" id="P77-W4-Pb3">
+                                <rect key="frame" x="0.0" y="103" width="393" height="666"/>
+                            </imageView>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="dDu-E9-D5F"/>
+                        <color key="backgroundColor" name="YP Black"/>
+                        <constraints>
+                            <constraint firstItem="dDu-E9-D5F" firstAttribute="trailing" secondItem="P77-W4-Pb3" secondAttribute="trailing" id="3ke-ag-J4k"/>
+                            <constraint firstItem="P77-W4-Pb3" firstAttribute="leading" secondItem="dDu-E9-D5F" secondAttribute="leading" id="EOc-8k-CE0"/>
+                            <constraint firstItem="dDu-E9-D5F" firstAttribute="bottom" secondItem="P77-W4-Pb3" secondAttribute="bottom" id="dbz-si-sZs"/>
+                            <constraint firstItem="P77-W4-Pb3" firstAttribute="top" secondItem="dDu-E9-D5F" secondAttribute="top" id="gB3-US-iFT"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" id="ftH-ko-RxM"/>
+                    <connections>
+                        <outlet property="imageView" destination="P77-W4-Pb3" id="kfr-9s-ymu"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="lTK-hM-NmB" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1955" y="4"/>
         </scene>
         <!--Profile View Controller-->
         <scene sceneID="Y91-ZL-fAz">
