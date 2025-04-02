@@ -108,9 +108,22 @@
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="0" translatesAutoresizingMaskIntoConstraints="NO" id="P77-W4-Pb3">
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Euq-Dv-How">
                                 <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
-                            </imageView>
+                                <subviews>
+                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="0" translatesAutoresizingMaskIntoConstraints="NO" id="P77-W4-Pb3">
+                                        <rect key="frame" x="0.0" y="0.0" width="1600" height="1059"/>
+                                    </imageView>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstAttribute="bottom" secondItem="P77-W4-Pb3" secondAttribute="bottom" id="Gdd-gU-45q"/>
+                                    <constraint firstItem="P77-W4-Pb3" firstAttribute="top" secondItem="Euq-Dv-How" secondAttribute="top" id="O6J-Dn-mn9"/>
+                                    <constraint firstItem="P77-W4-Pb3" firstAttribute="leading" secondItem="Euq-Dv-How" secondAttribute="leading" id="egE-Zx-oXw"/>
+                                    <constraint firstAttribute="trailing" secondItem="P77-W4-Pb3" secondAttribute="trailing" id="jb3-aN-5fR"/>
+                                </constraints>
+                                <viewLayoutGuide key="contentLayoutGuide" id="XC4-F0-Zuc"/>
+                                <viewLayoutGuide key="frameLayoutGuide" id="yzw-aT-UA1"/>
+                            </scrollView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="uw9-lR-q0v" userLabel="Backward Button">
                                 <rect key="frame" x="8" y="8" width="44" height="44"/>
                                 <constraints>
@@ -127,17 +140,18 @@
                         <viewLayoutGuide key="safeArea" id="dDu-E9-D5F"/>
                         <color key="backgroundColor" name="YP Black"/>
                         <constraints>
-                            <constraint firstAttribute="trailing" secondItem="P77-W4-Pb3" secondAttribute="trailing" id="3ke-ag-J4k"/>
-                            <constraint firstItem="P77-W4-Pb3" firstAttribute="leading" secondItem="UYP-Gq-67v" secondAttribute="leading" id="EOc-8k-CE0"/>
+                            <constraint firstAttribute="bottom" secondItem="Euq-Dv-How" secondAttribute="bottom" id="7cc-rg-xIP"/>
                             <constraint firstItem="uw9-lR-q0v" firstAttribute="top" secondItem="dDu-E9-D5F" secondAttribute="top" constant="8" id="UYs-v2-dj5"/>
-                            <constraint firstAttribute="bottom" secondItem="P77-W4-Pb3" secondAttribute="bottom" id="dbz-si-sZs"/>
-                            <constraint firstItem="P77-W4-Pb3" firstAttribute="top" secondItem="UYP-Gq-67v" secondAttribute="top" id="gB3-US-iFT"/>
+                            <constraint firstItem="Euq-Dv-How" firstAttribute="top" secondItem="UYP-Gq-67v" secondAttribute="top" id="gL0-RF-GOo"/>
+                            <constraint firstItem="Euq-Dv-How" firstAttribute="leading" secondItem="UYP-Gq-67v" secondAttribute="leading" id="gtf-zg-lNo"/>
+                            <constraint firstAttribute="trailing" secondItem="Euq-Dv-How" secondAttribute="trailing" id="llN-sa-8l0"/>
                             <constraint firstItem="uw9-lR-q0v" firstAttribute="leading" secondItem="dDu-E9-D5F" secondAttribute="leading" constant="8" id="tVx-jS-VdG"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="ftH-ko-RxM"/>
                     <connections>
                         <outlet property="imageView" destination="P77-W4-Pb3" id="kfr-9s-ymu"/>
+                        <outlet property="scrollView" destination="Euq-Dv-How" id="Q6n-Yk-zSo"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="lTK-hM-NmB" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>

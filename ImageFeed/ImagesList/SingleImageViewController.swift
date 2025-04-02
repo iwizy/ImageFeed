@@ -14,6 +14,7 @@ final class SingleImageViewController: UIViewController {
                 imageView.image = image
             }
         }
+    @IBOutlet weak var scrollView: UIScrollView!
     
     @IBOutlet var imageView: UIImageView!
     
