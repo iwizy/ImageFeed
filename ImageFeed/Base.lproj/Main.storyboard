@@ -103,22 +103,36 @@
         <!--Single Image View Controller-->
         <scene sceneID="3Lt-i5-hGw">
             <objects>
-                <viewController id="gpT-9k-QYJ" customClass="SingleImageViewController" customModule="ImageFeed" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController modalPresentationStyle="fullScreen" id="gpT-9k-QYJ" customClass="SingleImageViewController" customModule="ImageFeed" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="UYP-Gq-67v">
-                        <rect key="frame" x="0.0" y="0.0" width="393" height="842"/>
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="0" translatesAutoresizingMaskIntoConstraints="NO" id="P77-W4-Pb3">
-                                <rect key="frame" x="0.0" y="0.0" width="393" height="842"/>
+                                <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                             </imageView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="uw9-lR-q0v" userLabel="Backward Button">
+                                <rect key="frame" x="8" y="8" width="44" height="44"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="44" id="PNz-z6-27s"/>
+                                    <constraint firstAttribute="height" constant="44" id="rV2-s4-He8"/>
+                                </constraints>
+                                <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                <state key="normal" image="backward"/>
+                                <connections>
+                                    <action selector="backwardButton:" destination="gpT-9k-QYJ" eventType="touchUpInside" id="ywY-8k-VA1"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="dDu-E9-D5F"/>
                         <color key="backgroundColor" name="YP Black"/>
                         <constraints>
-                            <constraint firstItem="dDu-E9-D5F" firstAttribute="trailing" secondItem="P77-W4-Pb3" secondAttribute="trailing" id="3ke-ag-J4k"/>
-                            <constraint firstItem="P77-W4-Pb3" firstAttribute="leading" secondItem="dDu-E9-D5F" secondAttribute="leading" id="EOc-8k-CE0"/>
-                            <constraint firstItem="dDu-E9-D5F" firstAttribute="bottom" secondItem="P77-W4-Pb3" secondAttribute="bottom" id="dbz-si-sZs"/>
-                            <constraint firstItem="P77-W4-Pb3" firstAttribute="top" secondItem="dDu-E9-D5F" secondAttribute="top" id="gB3-US-iFT"/>
+                            <constraint firstAttribute="trailing" secondItem="P77-W4-Pb3" secondAttribute="trailing" id="3ke-ag-J4k"/>
+                            <constraint firstItem="P77-W4-Pb3" firstAttribute="leading" secondItem="UYP-Gq-67v" secondAttribute="leading" id="EOc-8k-CE0"/>
+                            <constraint firstItem="uw9-lR-q0v" firstAttribute="top" secondItem="dDu-E9-D5F" secondAttribute="top" constant="8" id="UYs-v2-dj5"/>
+                            <constraint firstAttribute="bottom" secondItem="P77-W4-Pb3" secondAttribute="bottom" id="dbz-si-sZs"/>
+                            <constraint firstItem="P77-W4-Pb3" firstAttribute="top" secondItem="UYP-Gq-67v" secondAttribute="top" id="gB3-US-iFT"/>
+                            <constraint firstItem="uw9-lR-q0v" firstAttribute="leading" secondItem="dDu-E9-D5F" secondAttribute="leading" constant="8" id="tVx-jS-VdG"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="ftH-ko-RxM"/>
@@ -236,6 +250,7 @@
     </scenes>
     <resources>
         <image name="0" width="1600" height="1059"/>
+        <image name="backward" width="24" height="24"/>
         <image name="logout_button" width="44" height="44"/>
         <image name="profile_photo" width="1913" height="1913"/>
         <image name="tab_editorial_active" width="30.333333969116211" height="30"/>
