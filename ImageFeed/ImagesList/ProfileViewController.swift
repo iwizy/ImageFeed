@@ -79,10 +79,12 @@ final class ProfileViewController: UIViewController {
         loginNameLabel.text = "@iWizard"
         loginNameLabel.textColor = UIColor(named: "YP Gray")
         loginNameLabel.font = UIFont(name: "SF Pro", size: 13)
+        
+        // Констрейнты
         loginNameLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16).isActive = true
         loginNameLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 8).isActive = true
         
-        // Констрейнты
+        // Создание и установка лейбла описания на вьюху
         let descriptionLabel = UILabel()
         descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(descriptionLabel)
