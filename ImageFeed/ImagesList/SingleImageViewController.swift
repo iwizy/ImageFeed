@@ -80,7 +80,6 @@ final class SingleImageViewController: UIViewController {
     
     // Обработчик жестов смахивания
     @objc private func handleSwipe(_ gesture: UISwipeGestureRecognizer) {
-        
         dismiss(animated: true, completion: nil)
     }
     

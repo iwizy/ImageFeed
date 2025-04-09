@@ -9,7 +9,7 @@ import UIKit
 final class ProfileViewController: UIViewController {
     
     // Делаем опциональную переменную для вью
-    var profileImageView: UIImageView?
+    private var profileImageView: UIImageView?
     
     // Функция установки аватарки профиля
     private func profileImageSetup() {
@@ -61,8 +61,8 @@ final class ProfileViewController: UIViewController {
         // Заполняем лейбл значением и устанавливаем его параметры
         nameLabel.text = "Александр Агафонов"
         nameLabel.textColor = UIColor(named: "YP White")
-        nameLabel.font = UIFont(name: "SF Pro", size: 23)
-        nameLabel.font = UIFont.boldSystemFont(ofSize: 23) // болдим шрифт
+        nameLabel.font = UIFont.systemFont(ofSize: 23, weight: .bold)
+
         
         // Констрейнты
         nameLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16).isActive = true
@@ -78,7 +78,7 @@ final class ProfileViewController: UIViewController {
         // Заполняем лейбл значением и устанавливаем его параметры
         loginNameLabel.text = "@iWizard"
         loginNameLabel.textColor = UIColor(named: "YP Gray")
-        loginNameLabel.font = UIFont(name: "SF Pro", size: 13)
+        loginNameLabel.font = UIFont.systemFont(ofSize: 13, weight: .regular)
         
         // Констрейнты
         loginNameLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16).isActive = true
@@ -92,7 +92,7 @@ final class ProfileViewController: UIViewController {
         // Заполняем лейбл значением и устанавливаем его параметры
         descriptionLabel.text = "Hello, reviewer!"
         descriptionLabel.textColor = UIColor(named: "YP White")
-        descriptionLabel.font = UIFont(name: "SF Pro", size: 13)
+        descriptionLabel.font = UIFont.systemFont(ofSize: 13, weight: .regular)
         
         // Констрейнты
         descriptionLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16).isActive = true
