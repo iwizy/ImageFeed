@@ -8,74 +8,73 @@ import UIKit
 
 final class ProfileViewController: UIViewController {
     
-    // Делаем опциональную переменную для вью
+    // MARK: - Properties
+    // Опциональное свойство для хранения изображения профиля
+    // Используется weak var, так как UIImageView уже хранится в view hierarchy
     private var profileImageView: UIImageView?
     
-    // Функция установки аватарки профиля
+    // MARK: - Private Methods
+    
+    // Настройка аватарки профиля
     private func profileImageSetup() {
-        // Создание и установка аватарки на вьюху
         let profileImage = UIImage(named: "profile_photo")
         let profileImageView = UIImageView(image: profileImage)
         profileImageView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(profileImageView)
         
-        // Размер и округление
+        // Констрейнты
         profileImageView.widthAnchor.constraint(equalToConstant: 70).isActive = true
         profileImageView.heightAnchor.constraint(equalToConstant: 70).isActive = true
         profileImageView.layer.cornerRadius = 35
         profileImageView.layer.masksToBounds = true
-        
-        // Констрейнты
         profileImageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 32).isActive = true
         profileImageView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16).isActive = true
+        // Сохраняем ссылку на imageView в свойство класса
         self.profileImageView = profileImageView
-        
     }
     
-    // Функция кнопки выхода
+    // Настройка кнопки выхода
     private func logoutButtonSetup() {
-        // Создание и установка кнопки на вьюху
         let logoutImage = UIImage(named: "logout_button")
-        guard let logoutImage else { return } // Распаковка картинки, так как они опциональны
+        guard let logoutImage else { return } // Безопасная распаковка опционального изображения
         let logoutButton = UIButton.systemButton(with: logoutImage, target: self, action: nil)
         logoutButton.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(logoutButton)
         
-        // Размеры и констрейнты
+        // Установка размеров кнопки
         logoutButton.widthAnchor.constraint(equalToConstant: 44).isActive = true
         logoutButton.heightAnchor.constraint(equalToConstant: 44).isActive = true
+        
+        // Констрейнты
         logoutButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16).isActive = true
-        guard let profileImageView else { return } // Распаковка картинки, иначе ошибка
+        guard let profileImageView else { return } // Проверяем, что profileImageView был создан
         logoutButton.centerYAnchor.constraint(equalTo: profileImageView.centerYAnchor).isActive = true
         logoutButton.tintColor = UIColor(named: "YP Red")
-        
     }
     
-    // Функция размещения лейблов
+    // Настройка текстовых лейблов (имя, логин, описание)
     private func labelsSetup() {
-        // Создание и установка лейбла имени на вьюху
+        // MARK: - Name Label
         let nameLabel = UILabel()
         nameLabel.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(nameLabel)
         
-        // Заполняем лейбл значением и устанавливаем его параметры
+        // Установка текста, цвета и шрифта для имени
         nameLabel.text = "Александр Агафонов"
         nameLabel.textColor = UIColor(named: "YP White")
         nameLabel.font = UIFont.systemFont(ofSize: 23, weight: .bold)
 
-        
         // Констрейнты
         nameLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16).isActive = true
-        guard let profileImageView else { return } // Распаковка картинки, иначе ошибка
+        guard let profileImageView else { return }
         nameLabel.topAnchor.constraint(equalTo: profileImageView.bottomAnchor, constant: 8).isActive = true
     
-        
-        // Создание и установка лейбла логина на вьюху
+        // MARK: - Login Label
         let loginNameLabel = UILabel()
         loginNameLabel.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(loginNameLabel)
         
-        // Заполняем лейбл значением и устанавливаем его параметры
+        // Установка текста, цвета и шрифта для логина
         loginNameLabel.text = "@iWizard"
         loginNameLabel.textColor = UIColor(named: "YP Gray")
         loginNameLabel.font = UIFont.systemFont(ofSize: 13, weight: .regular)
@@ -84,12 +83,12 @@ final class ProfileViewController: UIViewController {
         loginNameLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16).isActive = true
         loginNameLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 8).isActive = true
         
-        // Создание и установка лейбла описания на вьюху
+        // MARK: - Description Label
         let descriptionLabel = UILabel()
         descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(descriptionLabel)
         
-        // Заполняем лейбл значением и устанавливаем его параметры
+        // Установка текста, цвета и шрифта для описания
         descriptionLabel.text = "Hello, reviewer!"
         descriptionLabel.textColor = UIColor(named: "YP White")
         descriptionLabel.font = UIFont.systemFont(ofSize: 13, weight: .regular)
@@ -99,7 +98,10 @@ final class ProfileViewController: UIViewController {
         descriptionLabel.topAnchor.constraint(equalTo: loginNameLabel.bottomAnchor, constant: 8).isActive = true
     }
     
+    // MARK: - Lifecycle
     override func viewDidLoad() {
+        super.viewDidLoad()
+        // Вызов методов настройки UI при загрузке view
         profileImageSetup()
         logoutButtonSetup()
         labelsSetup()
