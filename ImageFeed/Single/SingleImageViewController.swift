@@ -96,7 +96,7 @@ final class SingleImageViewController: UIViewController {
         scrollView.addGestureRecognizer(swipeDown)
         swipeDown.delegate = self
         self.swipeDownGesture = swipeDown  // Сохраняем в свойство (если нужно)
-
+        
         let swipeRight = UISwipeGestureRecognizer(
             target: self,
             action: #selector(handleSwipe(_:))
@@ -118,7 +118,7 @@ final class SingleImageViewController: UIViewController {
 extension SingleImageViewController: UIScrollViewDelegate {
     // Указываем какой view должен масштабироваться
     func viewForZooming(in scrollView: UIScrollView) -> UIView? {
-        return imageView
+        imageView
     }
     
     // Обновляем отступы после изменения масштаба
@@ -159,15 +159,14 @@ extension SingleImageViewController: UIGestureRecognizerDelegate {
     // Определяем условия срабатывания жестов
     func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
         if let swipeGesture = gestureRecognizer as? UISwipeGestureRecognizer {
-            switch swipeGesture.direction {
+            return switch swipeGesture.direction {
             case .down:
                 // Свайп вниз работает только когда scrollView вверху
-                return scrollView.contentOffset.y <= 0
+                scrollView.contentOffset.y <= 0
             case .right:
                 // Свайп вправо работает только когда scrollView слева
-                return scrollView.contentOffset.x <= 0
-            default:
-                return true
+                scrollView.contentOffset.x <= 0
+            default: true
             }
         }
         return true

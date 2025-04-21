@@ -20,10 +20,6 @@ final class AuthViewController: UIViewController {
     // Идентификатор перехода к WebView
     private let showWebViewSegueIdentifier = "ShowWebView"
     
-    // MARK: Properties
-    // Сервис для работы с OAuth 2.0
-    let oauth2Service = OAuth2Service.shared
-    
     // Делегат для обработки событий авторизации
     weak var delegate: AuthViewControllerDelegate?
     
@@ -54,7 +50,7 @@ final class AuthViewController: UIViewController {
         
         // Настраиваем UI при загрузке view
         configureBackButton()
-        self.navigationItem.hidesBackButton = true
+        navigationItem.hidesBackButton = true
     }
     
     // MARK: Navigation

@@ -31,7 +31,7 @@ extension URLSession {
         
         // Создаем и настраиваем задачу URLSession
         let task = dataTask(with: request) { data, response, error in
-            if let data = data,
+            if let data,
                let response = response as? HTTPURLResponse {
                 if (200..<300).contains(response.statusCode) {
                     // Декодирование токена из данных
@@ -44,7 +44,7 @@ extension URLSession {
                         completionOnMainQueue(.failure(error)) // Передача ошибки декодирования
                     }
                 } else {
-                    // Логирование ошибок от сервиса Unsplash с кодом >=300
+                    // Логирование ошибок от сервиса с кодом >=300
                     if response.statusCode >= 300 {
                         let responseBody = String(data: data, encoding: .utf8) ?? "Не удалось преобразовать данные"
                         print("""

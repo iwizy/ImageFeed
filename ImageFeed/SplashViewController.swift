@@ -22,7 +22,7 @@ final class SplashViewController: UIViewController {
         super.viewDidAppear(animated)
         
         // Проверяем наличие токена для определения следующего экрана
-        if let token = tokenStorage.token {
+        if tokenStorage.token != nil {
             navigateToTabBarController()
         } else {
             performSegue(withIdentifier: showAuthViewSegueIdentifier, sender: nil)
@@ -61,7 +61,9 @@ extension SplashViewController {
         if segue.identifier == showAuthViewSegueIdentifier {
             // Настраиваем AuthViewController перед переходом
             guard let authViewController = segue.destination as? AuthViewController else {
-                fatalError("Failed to prepare for \(showAuthViewSegueIdentifier)")
+                // Логируем ошибку и безопасно обрабатываем ситуацию
+                print("Не найден целевой вью контроллер")
+                return
             }
             authViewController.delegate = self
         } else {
@@ -76,8 +78,7 @@ extension SplashViewController: AuthViewControllerDelegate {
     // Обработка успешной аутентификации
     func authViewController(_ vc: AuthViewController, didAuthenticateWith code: String) {
         // Закрываем экран авторизации и запрашиваем токен
-        dismiss(animated: true) { [weak self] in
-            guard let self = self else { return }
+        dismiss(animated: true) {
             self.fetchOAuthToken(code)
         }
     }
