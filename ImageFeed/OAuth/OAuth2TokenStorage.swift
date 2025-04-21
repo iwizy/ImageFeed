@@ -9,7 +9,7 @@ import Foundation
 // Используем UserDefaults в качестве хранилища
 final class OAuth2TokenStorage {
     
-    // MARK: - Token Property
+    // MARK: Token Property
     private(set) var token: String? {
         get {
             // Получаем токен из стандартного хранилища UserDefaults
@@ -22,7 +22,7 @@ final class OAuth2TokenStorage {
         }
     }
     
-    // MARK: - Public Methods
+    // MARK: Public Methods
     
     // Сохраняет новый токен в хранилище.
     

@@ -15,18 +15,19 @@ protocol AuthViewControllerDelegate: AnyObject {
 // Контроллер для экрана авторизации, управляет процессом OAuth аутентификации
 final class AuthViewController: UIViewController {
     
-    // MARK: - Constants
+
+    // MARK: Constants
     // Идентификатор перехода к WebView
     private let showWebViewSegueIdentifier = "ShowWebView"
     
-    // MARK: - Properties
+    // MARK: Properties
     // Сервис для работы с OAuth 2.0
     let oauth2Service = OAuth2Service.shared
     
     // Делегат для обработки событий авторизации
     weak var delegate: AuthViewControllerDelegate?
     
-    // MARK: - UI Configuration
+    // MARK: UI Configuration
     
     // Настраивает кнопку "Назад" в navigation bar
     private func configureBackButton() {
@@ -46,16 +47,17 @@ final class AuthViewController: UIViewController {
         navigationItem.backBarButtonItem?.tintColor = UIColor(named: "YP Black")
     }
     
-    // MARK: - View Lifecycle
+    // MARK: View Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         // Настраиваем UI при загрузке view
         configureBackButton()
+        self.navigationItem.hidesBackButton = true
     }
     
-    // MARK: - Navigation
+    // MARK: Navigation
     
     // Подготавливает данные перед переходом на другой экран
 
@@ -76,7 +78,7 @@ final class AuthViewController: UIViewController {
     }
 }
 
-// MARK: - WebViewViewControllerDelegate
+// MARK: WebViewViewControllerDelegate
 
 extension AuthViewController: WebViewViewControllerDelegate {
     // Обрабатывает успешную авторизацию через WebView

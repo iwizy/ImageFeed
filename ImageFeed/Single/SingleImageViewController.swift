@@ -114,7 +114,7 @@ final class SingleImageViewController: UIViewController {
     }
 }
 
-// MARK: - UIScrollViewDelegate
+// MARK: UIScrollViewDelegate
 
 extension SingleImageViewController: UIScrollViewDelegate {
     // Указываем какой view должен масштабироваться
@@ -146,7 +146,7 @@ extension SingleImageViewController: UIScrollViewDelegate {
     }
 }
 
-// MARK: - UIGestureRecognizerDelegate
+// MARK: UIGestureRecognizerDelegate
 
 extension SingleImageViewController: UIGestureRecognizerDelegate {
     // Разрешаем одновременную работу нескольких жестов

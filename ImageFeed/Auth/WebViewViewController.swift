@@ -25,7 +25,7 @@ protocol WebViewViewControllerDelegate: AnyObject {
 // Контроллер для отображения веб-интерфейса авторизации через OAuth 2.0
 final class WebViewViewController: UIViewController {
     
-    // MARK: - Outlets
+    // MARK: Outlets
     
     // Веб-вью для отображения страницы авторизации
     @IBOutlet private var webView: WKWebView!
@@ -33,12 +33,12 @@ final class WebViewViewController: UIViewController {
     // Индикатор прогресса загрузки страницы
     @IBOutlet private var progressView: UIProgressView!
     
-    // MARK: - Properties
+    // MARK: Properties
     
     // Делегат для обработки событий авторизации
     weak var delegate: WebViewViewControllerDelegate?
     
-    // MARK: - Authorization
+    // MARK: Authorization
     
     // Загружает страницу авторизации Unsplash с необходимыми параметрами
     private func loadAuthView() {
@@ -67,7 +67,7 @@ final class WebViewViewController: UIViewController {
         webView.load(request)
     }
     
-    // MARK: - Progress Handling
+    // MARK: Progress Handling
     
     // Обновляет состояние индикатора прогресса загрузки
     // Скрывает прогресс-бар когда загрузка завершена (прогресс ≈ 1.0)
@@ -78,7 +78,7 @@ final class WebViewViewController: UIViewController {
         progressView.isHidden = fabs(webView.estimatedProgress - 1.0) <= 0.0001
     }
     
-    // MARK: - View Lifecycle
+    // MARK: View Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -114,7 +114,7 @@ final class WebViewViewController: UIViewController {
         )
     }
     
-    // MARK: - Key-Value Observing
+    // MARK: Key-Value Observing
     
     // Обрабатывает изменения наблюдаемых свойств
     override func observeValue(
@@ -138,7 +138,7 @@ final class WebViewViewController: UIViewController {
     }
 }
 
-// MARK: - WKNavigationDelegate
+// MARK: WKNavigationDelegate
 
 extension WebViewViewController: WKNavigationDelegate {
     

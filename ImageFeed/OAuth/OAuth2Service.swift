@@ -13,19 +13,19 @@ final class OAuth2Service {
         case urlSessionError
     }
     
-    // MARK: - Singleton
+    // MARK: Singleton
     // Общий экземпляр сервиса (Singleton)
     static let shared = OAuth2Service()
     
-    // MARK: - Dependencies
+    // MARK: Dependencies
     // Хранилище для токенов OAuth 2.0
     private let tokenStorage = OAuth2TokenStorage()
     
-    // MARK: - Initialization
+    // MARK: Initialization
     // Приватный инициализатор для реализации паттерна Singleton
     private init() {}
     
-    // MARK: - Request Construction
+    // MARK: Request Construction
     
     // Создает URLRequest для получения OAuth токена
     private func makeOAuthTokenRequest(code: String) -> URLRequest? {
@@ -54,7 +54,7 @@ final class OAuth2Service {
         
         // Проверяем итоговый URL
         guard let url = urlComponents.url else {
-            print("[OAuth2Service] Ошибка: Не удалось создать URL")
+            print("[OAuth2Service] Ошибка: Не удалось создать URL из компонентов")
             return nil
         }
         
@@ -65,7 +65,7 @@ final class OAuth2Service {
         return request
     }
     
-    // MARK: - Public Methods
+    // MARK: Public Methods
     
     // Получает OAuth токен по коду авторизации
     func fetchOAuthToken(
@@ -75,6 +75,7 @@ final class OAuth2Service {
         // Создаем запрос
         guard let request = makeOAuthTokenRequest(code: code) else {
             // Если не удалось создать запрос, завершаем с ошибкой
+            print("[OAuth2Service] Не удалось создать запрос")
             completion(.failure(NetworkError.invalidRequest))
             return
         }
@@ -83,6 +84,7 @@ final class OAuth2Service {
         let task = URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
             // Обрабатываем ошибку сети
             if let error = error {
+                print("[OAuth2Service] Сетевая ошибка: \(error.localizedDescription)")
                 completion(.failure(error))
                 return
             }

@@ -41,15 +41,18 @@ extension URLSession {
                     completionOnMainQueue(.success(data))
                 } else {
                     // Неуспешный статус-код
+                    print("[NetworkClient] Ошибка: статус-код \(response.statusCode)")
                     completionOnMainQueue(.failure(.httpStatusCode(response.statusCode)))
                 }
             }
             // Ошибка запроса
             else if let error = error {
+                print("[NetworkClient] Ошибка запроса: \(error.localizedDescription)")
                 completionOnMainQueue(.failure(.urlRequestError(error)))
             }
             // Неизвестная ошибка (нет данных и нет ошибки)
             else {
+                print("[NetworkClient] Ошибка: неизвестная ошибка URLSession (нет данных и ошибки)")
                 completionOnMainQueue(.failure(.urlSessionError))
             }
         }

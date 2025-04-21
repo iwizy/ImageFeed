@@ -8,12 +8,12 @@ import UIKit
 
 final class ProfileViewController: UIViewController {
     
-    // MARK: - Properties
+    // MARK: Properties
     // Опциональное свойство для хранения изображения профиля
     // Используется weak var, так как UIImageView уже хранится в view hierarchy
     private var profileImageView: UIImageView?
     
-    // MARK: - Private Methods
+    // MARK: Private Methods
     
     // Настройка аватарки профиля
     private func profileImageSetup() {
@@ -54,7 +54,7 @@ final class ProfileViewController: UIViewController {
     
     // Настройка текстовых лейблов (имя, логин, описание)
     private func labelsSetup() {
-        // MARK: - Name Label
+        // MARK: Name Label
         let nameLabel = UILabel()
         nameLabel.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(nameLabel)
@@ -69,7 +69,7 @@ final class ProfileViewController: UIViewController {
         guard let profileImageView else { return }
         nameLabel.topAnchor.constraint(equalTo: profileImageView.bottomAnchor, constant: 8).isActive = true
     
-        // MARK: - Login Label
+        // MARK: Login Label
         let loginNameLabel = UILabel()
         loginNameLabel.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(loginNameLabel)
@@ -83,7 +83,7 @@ final class ProfileViewController: UIViewController {
         loginNameLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16).isActive = true
         loginNameLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 8).isActive = true
         
-        // MARK: - Description Label
+        // MARK: Description Label
         let descriptionLabel = UILabel()
         descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(descriptionLabel)
@@ -98,7 +98,7 @@ final class ProfileViewController: UIViewController {
         descriptionLabel.topAnchor.constraint(equalTo: loginNameLabel.bottomAnchor, constant: 8).isActive = true
     }
     
-    // MARK: - Lifecycle
+    // MARK: Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         // Вызов методов настройки UI при загрузке view

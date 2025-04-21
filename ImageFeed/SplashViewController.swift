@@ -16,7 +16,7 @@ final class SplashViewController: UIViewController {
     private let oauth2Service = OAuth2Service.shared
     private let tokenStorage = OAuth2TokenStorage()
     
-    // MARK: - Lifecycle
+    // MARK: Lifecycle
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
@@ -40,7 +40,7 @@ final class SplashViewController: UIViewController {
         return .lightContent
     }
     
-    // MARK: - Private Methods
+    // MARK: Private Methods
     
     /// Переход к главному экрану с таб-баром
     private func navigateToTabBarController() {
@@ -54,7 +54,7 @@ final class SplashViewController: UIViewController {
     }
 }
 
-// MARK: - Navigation
+// MARK: Navigation
 
 extension SplashViewController {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -70,10 +70,10 @@ extension SplashViewController {
     }
 }
 
-// MARK: - AuthViewControllerDelegate
+// MARK: AuthViewControllerDelegate
 
 extension SplashViewController: AuthViewControllerDelegate {
-    /// Обработка успешной аутентификации
+    // Обработка успешной аутентификации
     func authViewController(_ vc: AuthViewController, didAuthenticateWith code: String) {
         // Закрываем экран авторизации и запрашиваем токен
         dismiss(animated: true) { [weak self] in
@@ -82,17 +82,18 @@ extension SplashViewController: AuthViewControllerDelegate {
         }
     }
     
-    /// Запрос OAuth токена по коду авторизации
+    // Запрос OAuth токена по коду авторизации
     private func fetchOAuthToken(_ code: String) {
         oauth2Service.fetchOAuthToken(code: code) { [weak self] result in
-            guard let self = self else { return }
+            guard let self else { return }
             
             DispatchQueue.main.async {
                 switch result {
                 case .success:
                     self.navigateToTabBarController()
-                case .failure:
+                case .failure(let error):
                     // В реальном приложении здесь должна быть обработка ошибки
+                    print("[OAuthViewController] Ошибка получения OAuth токена: \(error.localizedDescription)")
                     break
                 }
             }
