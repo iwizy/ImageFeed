@@ -13,16 +13,17 @@ enum NetworkError: Error {
     case urlSessionError // Неизвестная ошибка URLSession
     case noDataReceived // Ошибка отсутствия данных в ответе
     case decodingError(Error) // Ошибка декодирования данных
+    case invalidTokenFormat // Неверный формат токена
 }
 
 extension URLSession {
     // Выполняет сетевой запрос и возвращает результат в виде Data
     func fetchData(
         for request: URLRequest,
-        completion: @escaping (Result<Data, NetworkError>) -> Void
+        completion: @escaping (Result<String, Error>) -> Void
     ) -> URLSessionTask {
         // Обеспечиваем вызов completion на главном потоке
-        let completionOnMainQueue: (Result<Data, NetworkError>) -> Void = { result in
+        let completionOnMainQueue: (Result<String, Error>) -> Void = { result in
             DispatchQueue.main.async {
                 completion(result)
             }
@@ -30,30 +31,40 @@ extension URLSession {
         
         // Создаем и настраиваем задачу URLSession
         let task = dataTask(with: request) { data, response, error in
-            // Обрабатываем три возможных сценария:
-            
-            // Успешный ответ с данными
             if let data = data,
                let response = response as? HTTPURLResponse {
-                
-                // Проверяем валидный диапазон статус-кодов (200-299)
                 if (200..<300).contains(response.statusCode) {
-                    completionOnMainQueue(.success(data))
+                    // Декодирование токена из данных
+                    do {
+                        let token = try self.decodeToken(from: data)
+                        print("[NetworkClient] Токен успешно декодирован")
+                        completionOnMainQueue(.success(token)) // Возврат строки (токена)
+                    } catch {
+                        print("[NetworkClient] Ошибка декодирования токена: \(error.localizedDescription)")
+                        completionOnMainQueue(.failure(error)) // Передача ошибки декодирования
+                    }
                 } else {
-                    // Неуспешный статус-код
+                    // Логирование ошибок от сервиса Unsplash с кодом >=300
+                    if response.statusCode >= 300 {
+                        let responseBody = String(data: data, encoding: .utf8) ?? "Не удалось преобразовать данные"
+                        print("""
+                        [NetworkClient] Ошибка Unsplash API:
+                        - Код статуса: \(response.statusCode)
+                        - Тело ответа: \(responseBody)
+                        """)
+                    }
+                    
                     print("[NetworkClient] Ошибка: статус-код \(response.statusCode)")
-                    completionOnMainQueue(.failure(.httpStatusCode(response.statusCode)))
+                    completionOnMainQueue(.failure(NetworkError.httpStatusCode(response.statusCode)))
                 }
             }
-            // Ошибка запроса
             else if let error = error {
                 print("[NetworkClient] Ошибка запроса: \(error.localizedDescription)")
-                completionOnMainQueue(.failure(.urlRequestError(error)))
+                completionOnMainQueue(.failure(error)) // Передача оригинальной ошибки
             }
-            // Неизвестная ошибка (нет данных и нет ошибки)
             else {
                 print("[NetworkClient] Ошибка: неизвестная ошибка URLSession (нет данных и ошибки)")
-                completionOnMainQueue(.failure(.urlSessionError))
+                completionOnMainQueue(.failure(NetworkError.urlSessionError))
             }
         }
         
@@ -62,5 +73,20 @@ extension URLSession {
         
         // Возвращаем задачу для возможного управления (отмена и т.д.)
         return task
+    }
+    
+    // Приватный метод для декодирования токена
+    private func decodeToken(from data: Data) throws -> String {
+        struct TokenResponse: Decodable {
+            let authToken: String
+        }
+        
+        let decoder = JSONDecoder()
+        do {
+            let tokenResponse = try decoder.decode(TokenResponse.self, from: data)
+            return tokenResponse.authToken
+        } catch {
+            throw NetworkError.decodingError(error) // Проброс ошибки декодирования
+        }
     }
 }

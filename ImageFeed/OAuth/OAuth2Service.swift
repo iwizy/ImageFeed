@@ -116,8 +116,4 @@ final class OAuth2Service {
         task.resume()
     }
     
-    // Проверяет наличие сохраненного токена доступа
-    func isAccessTokenAvailable() -> Bool {
-        return tokenStorage.token != nil
-    }
 }
