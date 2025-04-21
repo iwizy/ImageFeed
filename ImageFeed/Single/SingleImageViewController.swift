@@ -29,8 +29,8 @@ final class SingleImageViewController: UIViewController {
     @IBOutlet var imageView: UIImageView!
     
     // Жесты для закрытия контроллера свайпом вниз и вправо
-    private var swipeDownGesture: UISwipeGestureRecognizer!
-    private var swipeRightGesture: UISwipeGestureRecognizer!
+    private var swipeDownGesture: UISwipeGestureRecognizer?
+    private var swipeRightGesture: UISwipeGestureRecognizer?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -88,24 +88,23 @@ final class SingleImageViewController: UIViewController {
     
     // Настройка жестов свайпа
     private func setupSwipeGestures() {
-        swipeDownGesture = UISwipeGestureRecognizer( // Инициализируем жест свайпа вниз
+        let swipeDown = UISwipeGestureRecognizer(
             target: self,
             action: #selector(handleSwipe(_:))
         )
-        swipeDownGesture.direction = .down
-        scrollView.addGestureRecognizer(swipeDownGesture) // Добавляем жест к scrollView (не к view)
-        
-        // Инициализируем жест свайпа вправо
-        swipeRightGesture = UISwipeGestureRecognizer(
+        swipeDown.direction = .down
+        scrollView.addGestureRecognizer(swipeDown)
+        swipeDown.delegate = self
+        self.swipeDownGesture = swipeDown  // Сохраняем в свойство (если нужно)
+
+        let swipeRight = UISwipeGestureRecognizer(
             target: self,
             action: #selector(handleSwipe(_:))
         )
-        swipeRightGesture.direction = .right
-        scrollView.addGestureRecognizer(swipeRightGesture)
-        
-        // Настраиваем делегатов для управления поведением жестов
-        swipeDownGesture.delegate = self
-        swipeRightGesture.delegate = self
+        swipeRight.direction = .right
+        scrollView.addGestureRecognizer(swipeRight)
+        swipeRight.delegate = self
+        self.swipeRightGesture = swipeRight  // Сохраняем в свойство (если нужно)
     }
     
     // Обработчик жестов свайпа
