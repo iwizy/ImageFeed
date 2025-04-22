@@ -93,7 +93,6 @@ extension SplashViewController: AuthViewControllerDelegate {
                 case .success:
                     self.navigateToTabBarController()
                 case .failure(let error):
-                    // В реальном приложении здесь должна быть обработка ошибки
                     print("[OAuthViewController] Ошибка получения OAuth токена: \(error.localizedDescription)")
                     break
                 }

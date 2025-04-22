@@ -12,14 +12,10 @@ final class SingleImageViewController: UIViewController {
     // didSet автоматически обновляет интерфейс при изменении изображения
     var image: UIImage? {
         didSet {
-            // Проверяем что view загружена и изображение существует
-            guard isViewLoaded, let image else { return }
-            // Устанавливаем изображение в imageView
-            imageView.image = image
-            // Обновляем размер imageView под размер изображения
-            imageView.frame.size = image.size
-            // Масштабируем и центрируем изображение в scrollView
-            rescaleAndCenterImageInScrollView(image: image)
+            guard isViewLoaded, let image else { return } // Проверяем что view загружена и изображение существует
+            imageView.image = image // Устанавливаем изображение в imageView
+            imageView.frame.size = image.size // Обновляем размер imageView под размер изображения
+            rescaleAndCenterImageInScrollView(image: image) // Масштабируем и центрируем изображение в scrollView
         }
     }
     
