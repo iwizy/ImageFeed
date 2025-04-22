@@ -81,33 +81,12 @@ final class OAuth2Service {
         }
         
         // Создаем и запускаем задачу URLSession
-        let task = URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
-            // Обрабатываем ошибку сети
-            if let error = error {
-                print("[OAuth2Service] Сетевая ошибка: \(error.localizedDescription)")
-                completion(.failure(error))
-                return
-            }
-            
-            // Проверяем наличие данных
-            guard let data = data else {
-                completion(.failure(NetworkError.urlSessionError))
-                return
-            }
-            
-            do {
-                // Парсим ответ сервера
-                let responseData = try JSONDecoder().decode(OAuthTokenResponseBody.self, from: data)
-                let accessToken = responseData.accessToken
-                
-                // Сохраняем токен в хранилище
-                self?.tokenStorage.storeToken(accessToken)
-                
-                // Возвращаем успешный результат
-                completion(.success(accessToken))
-            } catch {
-                // Обрабатываем ошибку декодирования
-                print("[OAuth2Service] Ошибка декодирования: \(error.localizedDescription)")
+        let task = URLSession.shared.fetchData(for: request) { [weak self] result in
+            switch result {
+            case .success(let token):
+                self?.tokenStorage.storeToken(token)
+                completion(.success(token))
+            case .failure(let error):
                 completion(.failure(error))
             }
         }

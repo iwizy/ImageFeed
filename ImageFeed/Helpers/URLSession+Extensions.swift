@@ -1,5 +1,5 @@
 //
-//  NetworkClient.swift
+//  URLSession+Extensions.swift
 //  ImageFeed
 //
 //  Сетевой клиент
@@ -31,40 +31,41 @@ extension URLSession {
         
         // Создаем и настраиваем задачу URLSession
         let task = dataTask(with: request) { data, response, error in
-            if let data,
-               let response = response as? HTTPURLResponse {
-                if (200..<300).contains(response.statusCode) {
-                    // Декодирование токена из данных
-                    do {
-                        let token = try self.decodeToken(from: data)
-                        print("[NetworkClient] Токен успешно декодирован")
-                        completionOnMainQueue(.success(token)) // Возврат строки (токена)
-                    } catch {
-                        print("[NetworkClient] Ошибка декодирования токена: \(error.localizedDescription)")
-                        completionOnMainQueue(.failure(error)) // Передача ошибки декодирования
-                    }
+            // Проверяем наличие данных и корректный HTTP-статус
+            guard let data = data,
+                  let response = response as? HTTPURLResponse else {
+                if let error = error {
+                    print("[NetworkClient] Ошибка запроса: \(error.localizedDescription)")
+                    completionOnMainQueue(.failure(error))
                 } else {
-                    // Логирование ошибок от сервиса с кодом >=300
-                    if response.statusCode >= 300 {
-                        let responseBody = String(data: data, encoding: .utf8) ?? "Не удалось преобразовать данные"
-                        print("""
-                        [NetworkClient] Ошибка Unsplash API:
-                        - Код статуса: \(response.statusCode)
-                        - Тело ответа: \(responseBody)
-                        """)
-                    }
-                    
-                    print("[NetworkClient] Ошибка: статус-код \(response.statusCode)")
-                    completionOnMainQueue(.failure(NetworkError.httpStatusCode(response.statusCode)))
+                    print("[NetworkClient] Ошибка: неизвестная ошибка URLSession (нет данных и ошибки)")
+                    completionOnMainQueue(.failure(NetworkError.urlSessionError))
                 }
+                return
             }
-            else if let error = error {
-                print("[NetworkClient] Ошибка запроса: \(error.localizedDescription)")
-                completionOnMainQueue(.failure(error)) // Передача оригинальной ошибки
-            }
-            else {
-                print("[NetworkClient] Ошибка: неизвестная ошибка URLSession (нет данных и ошибки)")
-                completionOnMainQueue(.failure(NetworkError.urlSessionError))
+            
+            // Проверяем статус-код (200-299)
+            if (200..<300).contains(response.statusCode) {
+                // Декодирование токена из данных
+                do {
+                    let tokenResponse = try JSONDecoder().decode(OAuthTokenResponseBody.self, from: data)
+                    print("[NetworkClient] Токен успешно декодирован")
+                    completionOnMainQueue(.success(tokenResponse.accessToken))
+                } catch {
+                    print("[NetworkClient] Ошибка декодирования токена: \(error.localizedDescription)")
+                    completionOnMainQueue(.failure(NetworkError.decodingError(error)))
+                }
+            } else {
+                if response.statusCode >= 300 {
+                    let responseBody = String(data: data, encoding: .utf8) ?? "Не удалось преобразовать данные"
+                    print("""
+                            [NetworkClient] Ошибка Unsplash API:
+                            - Код статуса: \(response.statusCode)
+                            - Тело ответа: \(responseBody)
+                            """)
+                }
+                print("[NetworkClient] Ошибка: статус-код \(response.statusCode)")
+                completionOnMainQueue(.failure(NetworkError.httpStatusCode(response.statusCode)))
             }
         }
         
