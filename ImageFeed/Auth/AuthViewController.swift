@@ -50,7 +50,6 @@ final class AuthViewController: UIViewController {
         
         // Настраиваем UI при загрузке view
         configureBackButton()
-        navigationItem.hidesBackButton = true
     }
     
     // MARK: Navigation
