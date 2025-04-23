@@ -154,17 +154,14 @@ extension SingleImageViewController: UIGestureRecognizerDelegate {
     
     // Определяем условия срабатывания жестов
     func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
-        if let swipeGesture = gestureRecognizer as? UISwipeGestureRecognizer {
-            return switch swipeGesture.direction {
-            case .down:
-                // Свайп вниз работает только когда scrollView вверху
-                scrollView.contentOffset.y <= 0
-            case .right:
-                // Свайп вправо работает только когда scrollView слева
-                scrollView.contentOffset.x <= 0
-            default: true
-            }
+        guard let swipeGesture = gestureRecognizer as? UISwipeGestureRecognizer else {
+            return true
         }
-        return true
+        
+        return switch swipeGesture.direction {
+        case .down: scrollView.contentOffset.y <= 0 // Свайп вниз работает только когда scrollView вверху
+        case .right: scrollView.contentOffset.x <= 0 // Свайп вправо работает только когда scrollView слева
+        default: true
+        }
     }
 }

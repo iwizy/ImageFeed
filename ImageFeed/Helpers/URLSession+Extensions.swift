@@ -32,9 +32,9 @@ extension URLSession {
         // Создаем и настраиваем задачу URLSession
         let task = dataTask(with: request) { data, response, error in
             // Проверяем наличие данных и корректный HTTP-статус
-            guard let data = data,
+            guard let data,
                   let response = response as? HTTPURLResponse else {
-                if let error = error {
+                if let error {
                     print("[NetworkClient] Ошибка запроса: \(error.localizedDescription)")
                     completionOnMainQueue(.failure(error))
                 } else {
