@@ -48,15 +48,15 @@ extension URLSession {
             if (200..<300).contains(response.statusCode) {
                 // Декодирование токена из данных
                 do {
-                    let tokenResponse = try JSONDecoder().decode(OAuthTokenResponseBody.self, from: data)
+                    let tokenResponse = try self.decodeToken(from: data)
                     print("[NetworkClient] Токен успешно декодирован")
-                    completionOnMainQueue(.success(tokenResponse.accessToken))
+                    completionOnMainQueue(.success(tokenResponse))
                 } catch {
                     print("[NetworkClient] Ошибка декодирования токена: \(error.localizedDescription)")
                     completionOnMainQueue(.failure(NetworkError.decodingError(error)))
                 }
             } else {
-                if response.statusCode >= 300 {
+                if response.statusCode >= 300 { // логируем ошибки с 300 и выше
                     let responseBody = String(data: data, encoding: .utf8) ?? "Не удалось преобразовать данные"
                     print("""
                             [NetworkClient] Ошибка Unsplash API:
@@ -64,28 +64,19 @@ extension URLSession {
                             - Тело ответа: \(responseBody)
                             """)
                 }
-                print("[NetworkClient] Ошибка: статус-код \(response.statusCode)")
                 completionOnMainQueue(.failure(NetworkError.httpStatusCode(response.statusCode)))
             }
         }
-        
-        // Запускаем задачу
-        task.resume()
-        
         // Возвращаем задачу для возможного управления (отмена и т.д.)
         return task
     }
     
     // Приватный метод для декодирования токена
     private func decodeToken(from data: Data) throws -> String {
-        struct TokenResponse: Decodable {
-            let authToken: String
-        }
-        
         let decoder = JSONDecoder()
         do {
-            let tokenResponse = try decoder.decode(TokenResponse.self, from: data)
-            return tokenResponse.authToken
+            let tokenResponse = try decoder.decode(OAuthTokenResponseBody.self, from: data)
+            return tokenResponse.accessToken
         } catch {
             throw NetworkError.decodingError(error) // Проброс ошибки декодирования
         }
