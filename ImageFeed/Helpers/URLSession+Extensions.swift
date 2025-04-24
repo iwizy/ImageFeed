@@ -14,6 +14,7 @@ enum NetworkError: Error {
     case noDataReceived // Ошибка отсутствия данных в ответе
     case decodingError(Error) // Ошибка декодирования данных
     case invalidTokenFormat // Неверный формат токена
+    case deallocated // Объект деаллоцирован
 }
 
 extension URLSession {
@@ -30,7 +31,14 @@ extension URLSession {
         }
         
         // Создаем и настраиваем задачу URLSession
-        let task = dataTask(with: request) { data, response, error in
+        let task = dataTask(with: request) { [weak self] data, response, error in
+            
+            // Проверяем, что self еще существует
+                    guard let self = self else {
+                        print("[NetworkClient] Объект NetworkClient был деаллоцирован")
+                        completionOnMainQueue(.failure(NetworkError.deallocated))
+                        return
+                    }
             // Проверяем наличие данных и корректный HTTP-статус
             guard let data,
                   let response = response as? HTTPURLResponse else {
