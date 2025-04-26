@@ -18,11 +18,34 @@ enum NetworkError: Error {
 }
 
 extension URLSession {
+    
+    // Структура для отслеживания активного запроса
+    private struct ActiveAuthRequest {
+        let task: URLSessionTask
+        let authCode: String
+    }
+    
+    // Статическая переменная для хранения текущего запроса
+    private static var currentAuthRequest: ActiveAuthRequest?
+    
     // Выполняет сетевой запрос и возвращает результат в виде Data
     func fetchData(
         for request: URLRequest,
+        authCode: String,
         completion: @escaping (Result<String, Error>) -> Void
-    ) -> URLSessionTask {
+    ) -> URLSessionTask? {
+        
+        // Проверка активного запроса
+        if let currentRequest = Self.currentAuthRequest {
+            if currentRequest.authCode == authCode {
+                currentRequest.task.cancel()
+                print("[NetworkClient] Отменен предыдущий запрос с тем же authCode")
+            } else {
+                print("[NetworkClient] Уже выполняется запрос с другим authCode. Пропускаем.")
+                return nil  // Изменено: Возвращаем nil вместо создания новой задачи
+            }
+        }
+        
         // Обеспечиваем вызов completion на главном потоке
         let completionOnMainQueue: (Result<String, Error>) -> Void = { result in
             DispatchQueue.main.async {
@@ -36,12 +59,16 @@ extension URLSession {
             // Проверяем, что self еще существует
             guard let self = self else {
                 print("[NetworkClient] Объект NetworkClient был деаллоцирован")
+                Self.currentAuthRequest = nil  // Явная очистка
                 completionOnMainQueue(.failure(NetworkError.deallocated))
                 return
             }
             // Проверяем наличие данных и корректный HTTP-статус
             guard let data,
                   let response = response as? HTTPURLResponse else {
+                
+                Self.currentAuthRequest = nil // Явная очистка
+                
                 if let error {
                     print("[NetworkClient] Ошибка запроса: \(error.localizedDescription)")
                     completionOnMainQueue(.failure(error))
@@ -58,9 +85,11 @@ extension URLSession {
                 do {
                     let tokenResponse = try self.decodeToken(from: data)
                     print("[NetworkClient] Токен успешно декодирован")
+                    Self.currentAuthRequest = nil
                     completionOnMainQueue(.success(tokenResponse))
                 } catch {
                     print("[NetworkClient] Ошибка декодирования токена: \(error.localizedDescription)")
+                    Self.currentAuthRequest = nil
                     completionOnMainQueue(.failure(NetworkError.decodingError(error)))
                 }
             } else {
@@ -72,10 +101,13 @@ extension URLSession {
                             - Тело ответа: \(responseBody)
                             """)
                 }
+                Self.currentAuthRequest = nil
                 completionOnMainQueue(.failure(NetworkError.httpStatusCode(response.statusCode)))
             }
         }
         // Возвращаем задачу для возможного управления (отмена и т.д.)
+        Self.currentAuthRequest = ActiveAuthRequest(task: task, authCode: authCode)
+        //task.resume()
         return task
     }
     

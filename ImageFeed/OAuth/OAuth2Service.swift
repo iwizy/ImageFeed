@@ -81,7 +81,7 @@ final class OAuth2Service {
         }
         
         // Создаем и запускаем задачу URLSession
-        let task = URLSession.shared.fetchData(for: request) { [weak self] result in
+        let task = URLSession.shared.fetchData(for: request, authCode: code) { [weak self] result in
             switch result {
             case .success(let token):
                 self?.tokenStorage.storeToken(token)
@@ -92,7 +92,7 @@ final class OAuth2Service {
         }
         
         // Запускаем задачу
-        task.resume()
+        task?.resume()
     }
     
 }
