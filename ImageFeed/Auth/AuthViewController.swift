@@ -5,6 +5,7 @@
 //  Класс вью контроллера авторизации
 
 import UIKit
+import ProgressHUD
 
 // Протокол делегата для обработки событий авторизации
 protocol AuthViewControllerDelegate: AnyObject {
@@ -78,6 +79,7 @@ final class AuthViewController: UIViewController {
 extension AuthViewController: WebViewViewControllerDelegate {
     // Обрабатывает успешную авторизацию через WebView
     func webViewViewController(_ vc: WebViewViewController, didAuthenticateWithCode code: String) {
+        ProgressHUD.animate()
         // Передаем событие дальше своему делегату
         delegate?.authViewController(self, didAuthenticateWith: code)
     }
