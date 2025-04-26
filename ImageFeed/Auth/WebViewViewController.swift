@@ -27,10 +27,7 @@ final class WebViewViewController: UIViewController {
     
     // MARK: Outlets
     
-    // Веб-вью для отображения страницы авторизации
     @IBOutlet private var webView: WKWebView!
-    
-    // Индикатор прогресса загрузки страницы
     @IBOutlet private var progressView: UIProgressView!
     
     // MARK: Properties
