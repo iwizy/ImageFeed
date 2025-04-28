@@ -48,9 +48,9 @@ final class AuthViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        navigationItem.hidesBackButton = true
         // Настраиваем UI при загрузке view
         configureBackButton()
+        navigationItem.hidesBackButton = true
     }
     
     // MARK: Navigation
@@ -79,7 +79,6 @@ final class AuthViewController: UIViewController {
 extension AuthViewController: WebViewViewControllerDelegate {
     // Обрабатывает успешную авторизацию через WebView
     func webViewViewController(_ vc: WebViewViewController, didAuthenticateWithCode code: String) {
-        ProgressHUD.animate()
         // Передаем событие дальше своему делегату
         delegate?.authViewController(self, didAuthenticateWith: code)
     }

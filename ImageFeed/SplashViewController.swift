@@ -85,6 +85,7 @@ extension SplashViewController: AuthViewControllerDelegate {
     
     // Запрос OAuth токена по коду авторизации
     private func fetchOAuthToken(_ code: String) {
+        UIBlockingProgressHUD.show()
         oauth2Service.fetchOAuthToken(code: code) { [weak self] result in
             guard let self else { return }
             
@@ -92,7 +93,10 @@ extension SplashViewController: AuthViewControllerDelegate {
                 switch result {
                 case .success:
                     self.navigateToTabBarController()
+                    sleep(5)
+                    UIBlockingProgressHUD.dismiss()
                 case .failure(let error):
+                    UIBlockingProgressHUD.dismiss()
                     print("[OAuthViewController] Ошибка получения OAuth токена: \(error.localizedDescription)")
                     break
                 }
