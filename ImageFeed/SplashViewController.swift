@@ -88,12 +88,10 @@ extension SplashViewController: AuthViewControllerDelegate {
         UIBlockingProgressHUD.show()
         oauth2Service.fetchOAuthToken(code: code) { [weak self] result in
             guard let self else { return }
-            
             DispatchQueue.main.async {
                 switch result {
                 case .success:
                     self.navigateToTabBarController()
-                    sleep(5)
                     UIBlockingProgressHUD.dismiss()
                 case .failure(let error):
                     UIBlockingProgressHUD.dismiss()
