@@ -2,48 +2,74 @@
 //  OAuth2Service.swift
 //  ImageFeed
 //
-//  Класс сервиса авторизации
+//  Сервис авторизации
 
 import Foundation
 
 final class OAuth2Service {
-    
+    // Типы ошибок сервиса
     enum NetworkError: Error {
-        case invalidRequest
-        case urlSessionError
+        case invalidRequest       // Некорректный запрос
+        case decodingError(Error) // Ошибка декодирования
+        case httpStatusCode(Int) // Ошибка HTTP-статуса (включая 300+)
     }
     
-    // MARK: Singleton
-    // Общий экземпляр сервиса (Singleton)
-    static let shared = OAuth2Service()
-    
-    // MARK: Dependencies
-    // Хранилище для токенов OAuth 2.0
+    static let shared = OAuth2Service()  // Синглтон
     private let tokenStorage = OAuth2TokenStorage()
     
-    // MARK: Initialization
-    // Приватный инициализатор для реализации паттерна Singleton
-    private init() {}
+    // Трекер активного запроса
+    private struct ActiveAuthRequest {
+        let task: URLSessionTask
+        let authCode: String
+    }
+    private var currentAuthRequest: ActiveAuthRequest?
     
-    // MARK: Request Construction
+    private init() {}  // Приватный инициализатор
     
-    // Создает URLRequest для получения OAuth токена
+    // MARK: - Обработка ответа
+    private func handleOAuthResponse(
+        data: Data,
+        response: HTTPURLResponse,
+        completion: @escaping (Result<String, Error>) -> Void
+    ) {
+        DispatchQueue.main.async {
+            // Проверяем успешные статусы (200-299)
+            if (200..<300).contains(response.statusCode) {
+                do {
+                    let decoder = JSONDecoder()
+                    let tokenResponse = try decoder.decode(OAuthTokenResponseBody.self, from: data)
+                    self.tokenStorage.storeToken(tokenResponse.accessToken)
+                    print("[OAuth2Service] Токен успешно получен и сохранён")
+                    completion(.success(tokenResponse.accessToken))
+                } catch {
+                    print("[OAuth2Service] Ошибка декодирования токена: \(error.localizedDescription)")
+                    completion(.failure(NetworkError.decodingError(error)))
+                }
+            } else {
+                let responseBody = String(data: data, encoding: .utf8) ?? "Не удалось преобразовать данные"
+                print("""
+                    [OAuth2Service] Ошибка API:
+                    - Код статуса: \(response.statusCode)  // Сюда попадают 300+, 400+, 500+
+                    - Тело ответа: \(responseBody)
+                    """)
+                
+                // Пробрасываем ошибку с кодом статуса
+                completion(.failure(NetworkError.httpStatusCode(response.statusCode)))
+            }
+        }
+    }
+    
+    // MARK: - Создание запроса
     private func makeOAuthTokenRequest(code: String) -> URLRequest? {
-        // Базовый URL Unsplash API
         let baseUrl = "https://unsplash.com"
-        // Путь для запроса токена
         let path = "/oauth/token"
         
-        // Создаем компоненты URL
         guard var urlComponents = URLComponents(string: baseUrl) else {
             print("[OAuth2Service] Ошибка: Неверный базовый URL")
             return nil
         }
         
-        // Устанавливаем путь
         urlComponents.path = path
-        
-        // Добавляем параметры запроса согласно OAuth 2.0 спецификации
         urlComponents.queryItems = [
             URLQueryItem(name: "client_id", value: Constants.accessKey),
             URLQueryItem(name: "client_secret", value: Constants.secretKey),
@@ -52,47 +78,61 @@ final class OAuth2Service {
             URLQueryItem(name: "grant_type", value: "authorization_code"),
         ]
         
-        // Проверяем итоговый URL
         guard let url = urlComponents.url else {
             print("[OAuth2Service] Ошибка: Не удалось создать URL из компонентов")
             return nil
         }
         
-        // Создаем и настраиваем запрос
         var request = URLRequest(url: url)
-        request.httpMethod = "POST" // Устанавливаем метод POST
-        
+        request.httpMethod = "POST"
         return request
     }
     
-    // MARK: Public Methods
-    
-    // Получает OAuth токен по коду авторизации
+    // MARK: - Основной метод
     func fetchOAuthToken(
         code: String,
         completion: @escaping (Result<String, Error>) -> Void
     ) {
-        // Создаем запрос
+        // Проверка дублирующихся запросов
+        if let currentRequest = currentAuthRequest {
+            if currentRequest.authCode == code {
+                currentRequest.task.cancel()
+                print("[OAuth2Service] Отменён предыдущий запрос с тем же authCode")
+            } else {
+                print("[OAuth2Service] Уже выполняется запрос с другим authCode")
+                completion(.failure(NetworkError.invalidRequest))
+                return
+            }
+        }
+        
         guard let request = makeOAuthTokenRequest(code: code) else {
-            // Если не удалось создать запрос, завершаем с ошибкой
-            print("[OAuth2Service] Не удалось создать запрос")
             completion(.failure(NetworkError.invalidRequest))
             return
         }
         
-        // Создаем и запускаем задачу URLSession
-        let task = URLSession.shared.fetchData(for: request, authCode: code) { [weak self] result in
+        let task = URLSession.shared.dataTask(for: request) { [weak self] (result: Result<(Data, HTTPURLResponse), Error>) in
+            guard let self = self else { return }
+            
+            defer {
+                DispatchQueue.main.async {
+                    self.currentAuthRequest = nil
+                }
+            }
+            
             switch result {
-            case .success(let token):
-                self?.tokenStorage.storeToken(token)
-                completion(.success(token))
+            case .success(let (data, response)):
+                print("[OAuth2Service] Получен ответ от сервера")
+                // Здесь вызывается обработчик, где проверяются статусы 300+
+                self.handleOAuthResponse(data: data, response: response, completion: completion)
             case .failure(let error):
-                completion(.failure(error))
+                print("[OAuth2Service] Ошибка сети: \(error.localizedDescription)")
+                DispatchQueue.main.async {
+                    completion(.failure(error))
+                }
             }
         }
         
-        // Запускаем задачу
-        task?.resume()
+        currentAuthRequest = ActiveAuthRequest(task: task, authCode: code)
+        task.resume()
     }
-    
 }

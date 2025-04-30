@@ -6,119 +6,41 @@
 
 import Foundation
 
-// Перечисление возможных сетевых ошибок
 enum NetworkError: Error {
-    case httpStatusCode(Int) // Ошибка HTTP статус-кода (выходящего за диапазон 200-299)
-    case urlRequestError(Error) // Ошибка при создании или выполнении URLRequest
-    case urlSessionError // Неизвестная ошибка URLSession
-    case noDataReceived // Ошибка отсутствия данных в ответе
-    case decodingError(Error) // Ошибка декодирования данных
-    case invalidTokenFormat // Неверный формат токена
-    case deallocated // Объект деаллоцирован
+    case httpStatusCode(Int)
+    case urlRequestError(Error)
+    case urlSessionError
+    case noDataReceived
 }
 
 extension URLSession {
-    
-    // Структура для отслеживания активного запроса
-    private struct ActiveAuthRequest {
-        let task: URLSessionTask
-        let authCode: String
-    }
-    
-    // Статическая переменная для хранения текущего запроса
-    private static var currentAuthRequest: ActiveAuthRequest?
-    
-    // Выполняет сетевой запрос и возвращает результат в виде Data
-    func fetchData(
+    func dataTask(
         for request: URLRequest,
-        authCode: String,
-        completion: @escaping (Result<String, Error>) -> Void
-    ) -> URLSessionTask? {
-        
-        // Проверка активного запроса
-        if let currentRequest = Self.currentAuthRequest {
-            if currentRequest.authCode == authCode {
-                currentRequest.task.cancel()
-                print("[NetworkClient] Отменен предыдущий запрос с тем же authCode")
-            } else {
-                print("[NetworkClient] Уже выполняется запрос с другим authCode. Пропускаем.")
-                return nil  // Изменено: Возвращаем nil вместо создания новой задачи
-            }
-        }
-        
-        // Обеспечиваем вызов completion на главном потоке
-        let completionOnMainQueue: (Result<String, Error>) -> Void = { result in
-            DispatchQueue.main.async {
-                completion(result)
-            }
-        }
-        
-        // Создаем и настраиваем задачу URLSession
-        let task = dataTask(with: request) { [weak self] data, response, error in
-            
-            // Проверяем, что self еще существует
-            guard let self = self else {
-                print("[NetworkClient] Объект NetworkClient был деаллоцирован")
-                Self.currentAuthRequest = nil  // Явная очистка
-                completionOnMainQueue(.failure(NetworkError.deallocated))
-                return
-            }
-            // Проверяем наличие данных и корректный HTTP-статус
-            guard let data,
-                  let response = response as? HTTPURLResponse else {
-                
-                Self.currentAuthRequest = nil // Явная очистка
-                
-                if let error {
-                    print("[NetworkClient] Ошибка запроса: \(error.localizedDescription)")
-                    completionOnMainQueue(.failure(error))
-                } else {
-                    print("[NetworkClient] Ошибка: неизвестная ошибка URLSession (нет данных и ошибки)")
-                    completionOnMainQueue(.failure(NetworkError.urlSessionError))
-                }
+        completion: @escaping (Result<(Data, HTTPURLResponse), Error>) -> Void
+    ) -> URLSessionTask {
+        let task = dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("[NetworkClient] Ошибка запроса: \(error.localizedDescription)")
+                completion(.failure(error))
                 return
             }
             
-            // Проверяем статус-код (200-299)
-            if (200..<300).contains(response.statusCode) {
-                // Декодирование токена из данных
-                do {
-                    let tokenResponse = try self.decodeToken(from: data)
-                    print("[NetworkClient] Токен успешно декодирован")
-                    Self.currentAuthRequest = nil
-                    completionOnMainQueue(.success(tokenResponse))
-                } catch {
-                    print("[NetworkClient] Ошибка декодирования токена: \(error.localizedDescription)")
-                    Self.currentAuthRequest = nil
-                    completionOnMainQueue(.failure(NetworkError.decodingError(error)))
-                }
-            } else {
-                if response.statusCode >= 300 { // логируем ошибки с 300 и выше
-                    let responseBody = String(data: data, encoding: .utf8) ?? "Не удалось преобразовать данные"
-                    print("""
-                            [NetworkClient] Ошибка Unsplash API:
-                            - Код статуса: \(response.statusCode)
-                            - Тело ответа: \(responseBody)
-                            """)
-                }
-                Self.currentAuthRequest = nil
-                completionOnMainQueue(.failure(NetworkError.httpStatusCode(response.statusCode)))
+            guard let data = data else {
+                print("[NetworkClient] Ошибка: нет данных в ответе")
+                completion(.failure(NetworkError.noDataReceived))
+                return
             }
+            
+            guard let response = response as? HTTPURLResponse else {
+                print("[NetworkClient] Ошибка: неверный тип ответа")
+                completion(.failure(NetworkError.urlSessionError))
+                return
+            }
+            
+            print("[NetworkClient] Получен ответ с кодом \(response.statusCode)")
+            completion(.success((data, response)))
         }
-        // Возвращаем задачу для возможного управления (отмена и т.д.)
-        Self.currentAuthRequest = ActiveAuthRequest(task: task, authCode: authCode)
-        //task.resume()
+        
         return task
-    }
-    
-    // Приватный метод для декодирования токена
-    private func decodeToken(from data: Data) throws -> String {
-        let decoder = JSONDecoder()
-        do {
-            let tokenResponse = try decoder.decode(OAuthTokenResponseBody.self, from: data)
-            return tokenResponse.accessToken
-        } catch {
-            throw NetworkError.decodingError(error) // Проброс ошибки декодирования
-        }
     }
 }
