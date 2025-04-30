@@ -45,17 +45,14 @@ final class ProfileService {
     func fetchProfile(_ token: String, completion: @escaping (Result<ProfileResult, Error>) -> Void) {
         assert(Thread.isMainThread)
         
-        // Отменяем предыдущий запрос, если он существует
         currentTask?.cancel()
         
-        // Создаем endpoint для запроса профиля
         let endpoint = NetworkClient.Endpoint(
             path: "/me",
             method: .get,
             headers: ["Authorization": "Bearer \(token)"]
         )
         
-        // Выполняем запрос через NetworkClient
         currentTask = networkClient.request(endpoint) { [weak self] (result: Result<ProfileResult, NetworkClient.NetworkError>) in
             DispatchQueue.main.async {
                 switch result {
@@ -82,6 +79,20 @@ final class ProfileService {
                     self?.currentTask = nil
                 }
             }
+        }
+    }
+    
+    // Добавленный метод для безопасного получения профиля
+    func getProfile(completion: @escaping (Result<ProfileResult, Error>) -> Void) {
+        if let profile = profile {
+            completion(.success(profile))
+        } else {
+            guard let token = tokenStorage.token else {
+                completion(.failure(NSError(domain: "ProfileError", code: -1,
+                                         userInfo: [NSLocalizedDescriptionKey: "Token not found"])))
+                return
+            }
+            fetchProfile(token, completion: completion)
         }
     }
 }
