@@ -12,8 +12,6 @@ final class OAuth2Service {
         case failedToGetToken(description: String)
     }
     
-
-    
     private struct ActiveAuthRequest {
         let task: URLSessionTask
         let authCode: String
