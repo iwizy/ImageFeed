@@ -9,14 +9,17 @@ import Foundation
 
 final class ProfileService {
     static let shared = ProfileService()
+    private init() {}
+    
     private let tokenStorage = OAuth2TokenStorage()
-    private let networkClient: NetworkClient
+    private let networkClient: NetworkClient = NetworkClient()
     
     private let syncQueue = DispatchQueue(label: "profile-service-sync-queue", attributes: .concurrent)
-    private var _profile: ProfileResult?
+    private var _profile: Profile?
     private var _currentTask: URLSessionTask?
     
-    private(set) var profile: ProfileResult? {
+    // Храним сразу Profile
+    private(set) var profile: Profile? {
         get {
             syncQueue.sync(flags: .barrier) { _profile }
         }
@@ -38,11 +41,7 @@ final class ProfileService {
         }
     }
     
-    private init(networkClient: NetworkClient = NetworkClient()) {
-        self.networkClient = networkClient
-    }
-    
-    func fetchProfile(_ token: String, completion: @escaping (Result<ProfileResult, Error>) -> Void) {
+    func fetchProfile(_ token: String, completion: @escaping (Result<Profile, Error>) -> Void) {
         assert(Thread.isMainThread)
         
         currentTask?.cancel()
@@ -57,8 +56,9 @@ final class ProfileService {
             DispatchQueue.main.async {
                 switch result {
                 case .success(let profileResult):
-                    self?.profile = profileResult
-                    completion(.success(profileResult))
+                    let profile = Profile(ProfileResult: profileResult)
+                    self?.profile = profile  // Сохраняем уже преобразованный Profile
+                    completion(.success(profile))
                     self?.currentTask = nil
                 case .failure(let networkError):
                     let error: Error
@@ -79,20 +79,6 @@ final class ProfileService {
                     self?.currentTask = nil
                 }
             }
-        }
-    }
-    
-    // Добавленный метод для безопасного получения профиля
-    func getProfile(completion: @escaping (Result<ProfileResult, Error>) -> Void) {
-        if let profile = profile {
-            completion(.success(profile))
-        } else {
-            guard let token = tokenStorage.token else {
-                completion(.failure(NSError(domain: "ProfileError", code: -1,
-                                         userInfo: [NSLocalizedDescriptionKey: "Token not found"])))
-                return
-            }
-            fetchProfile(token, completion: completion)
         }
     }
 }

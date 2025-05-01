@@ -71,7 +71,7 @@ final class ProfileViewController: UIViewController {
         super.viewDidLoad()
         setupViews()
         setupConstraints()
-        loadProfileData()
+        updateProfileData()
     }
     
     // MARK: - Private Methods
@@ -109,29 +109,15 @@ final class ProfileViewController: UIViewController {
         ])
     }
     
-    private func loadProfileData() {
-        profileService.getProfile { [weak self] result in
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let profileResult):
-                    self?.profileResult = profileResult
-                    print("Профиль успешно загружен")
-                case .failure(let error):
-                    print("Ошибка загрузки профиля: \(error.localizedDescription)")
-                    
-                }
-            }
-        }
-    }
     
     private func updateProfileData() {
-        guard let profile = currentProfile else {
-            print("Нет данных профиля для отображения")
-            return
+            guard let profile = profileService.profile else {
+                print("Нет данных профиля для отображения")
+                return
+            }
+            
+            nameLabel.text = profile.name
+            loginNameLabel.text = profile.loginName
+            descriptionLabel.text = profile.bio
         }
-        
-        nameLabel.text = profile.name
-        loginNameLabel.text = profile.loginName
-        descriptionLabel.text = profile.bio ?? ""
-    }
 }
