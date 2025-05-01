@@ -12,9 +12,14 @@ final class SplashViewController: UIViewController {
     // Идентификатор перехода к экрану авторизации
     private let showAuthViewSegueIdentifier = "ShowAuthView"
     
+    // Сервис профиля
+    private let profileService = ProfileService.shared
+    
     // Сервис для работы с OAuth2 и хранилище токенов
     private let oauth2Service = OAuth2Service.shared
     private let tokenStorage = OAuth2TokenStorage()
+    
+    
     
     // MARK: Lifecycle
     
@@ -22,11 +27,11 @@ final class SplashViewController: UIViewController {
         super.viewDidAppear(animated)
         
         // Проверяем наличие токена для определения следующего экрана
-        if tokenStorage.token != nil {
-            navigateToTabBarController()
-        } else {
-            performSegue(withIdentifier: showAuthViewSegueIdentifier, sender: nil)
-        }
+        if let token = tokenStorage.token, !token.isEmpty {
+                    loadProfileData()
+                } else {
+                    performSegue(withIdentifier: showAuthViewSegueIdentifier, sender: nil)
+                }
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -83,6 +88,25 @@ extension SplashViewController: AuthViewControllerDelegate {
         }
     }
     
+    
+    
+    
+    private func loadProfileData() {
+        profileService.getProfile { [weak self] result in
+            DispatchQueue.main.async { [self] in
+                switch result {
+                case .success(_):
+                    self?.navigateToTabBarController()
+                    print("Профиль успешно загружен из сплэш скрина")
+                case .failure(let error):
+                    print("Ошибка загрузки профиля: \(error.localizedDescription)")
+                    
+                }
+            }
+        }
+    }
+    
+    
     // Запрос OAuth токена по коду авторизации
     private func fetchOAuthToken(_ code: String) {
         UIBlockingProgressHUD.show()
@@ -91,7 +115,8 @@ extension SplashViewController: AuthViewControllerDelegate {
             DispatchQueue.main.async {
                 switch result {
                 case .success:
-                    self.navigateToTabBarController()
+                    self.loadProfileData()
+                    //self.navigateToTabBarController()
                     UIBlockingProgressHUD.dismiss()
                 case .failure(let error):
                     UIBlockingProgressHUD.dismiss()
