@@ -2,7 +2,6 @@
 //  SplashViewController.swift
 //  ImageFeed
 //
-//  Класс контроллера сплэша
 
 import UIKit
 
@@ -11,6 +10,7 @@ final class SplashViewController: UIViewController {
     private let profileService = ProfileService.shared
     private let oauth2Service = OAuth2Service.shared
     private let tokenStorage = OAuth2TokenStorage()
+    private let profileImageService = ProfileImageService.shared
     
     // MARK: Lifecycle
     
@@ -52,7 +52,6 @@ final class SplashViewController: UIViewController {
         window.rootViewController = tabBarView
     }
     
-    // MARK: - Изменения в методе загрузки профиля
     private func loadProfileData() {
         guard isAuthenticated(), let token = tokenStorage.token else {
             print("Ошибка: токен не найден или пуст")
@@ -60,22 +59,35 @@ final class SplashViewController: UIViewController {
             return
         }
         
-        // Используем напрямую profileService.profile вместо getProfile
-        if profileService.profile != nil {
+        if let profile = profileService.profile {
             // Если профиль уже загружен, сразу переходим
             self.navigateToTabBarController()
             print("Профиль уже загружен")
+            
+            // ИСПРАВЛЕНИЕ: Добавил безопасное извлечение username
+            if let username = profile.username {
+                ProfileImageService.shared.fetchProfileImageURL(username: username) { _ in }
+            }
         } else {
             // Если нет - загружаем
             profileService.fetchProfile(token) { [weak self] result in
                 DispatchQueue.main.async {
                     switch result {
                     case .success:
+                        guard let profile = self?.profileService.profile,
+                              let username = profile.username else {
+                            print("Профиль или username не загружены")
+                            self?.performSegue(withIdentifier: self?.showAuthViewSegueIdentifier ?? "", sender: nil)
+                            return
+                        }
+                        
                         self?.navigateToTabBarController()
                         print("Профиль успешно загружен")
+                        // ИСПРАВЛЕНИЕ: Теперь username точно есть
+                        ProfileImageService.shared.fetchProfileImageURL(username: username) { _ in }
+                        
                     case .failure(let error):
                         print("Ошибка загрузки профиля: \(error.localizedDescription)")
-                        // В случае ошибки показываем экран авторизации
                         self?.performSegue(withIdentifier: self?.showAuthViewSegueIdentifier ?? "", sender: nil)
                     }
                 }
@@ -109,7 +121,6 @@ extension SplashViewController: AuthViewControllerDelegate {
         }
     }
     
-    // MARK: - Изменения в запросе токена
     private func fetchOAuthToken(_ code: String) {
         UIBlockingProgressHUD.show()
         oauth2Service.fetchOAuthToken(code: code) { [weak self] result in
@@ -120,16 +131,26 @@ extension SplashViewController: AuthViewControllerDelegate {
                 
                 switch result {
                 case .success:
-                    // После успешного получения токена сразу загружаем профиль
                     guard let token = self.tokenStorage.token else {
                         print("Токен не сохранился")
                         return
                     }
+                    
                     self.profileService.fetchProfile(token) { result in
                         DispatchQueue.main.async {
                             switch result {
                             case .success:
+                                // ИСПРАВЛЕНИЕ: Добавил проверку на наличие username
+                                guard let profile = self.profileService.profile,
+                                      let username = profile.username else {
+                                    print("Профиль или username не загружены")
+                                    return
+                                }
+                                
                                 self.navigateToTabBarController()
+                                // ИСПРАВЛЕНИЕ: Теперь username точно есть
+                                ProfileImageService.shared.fetchProfileImageURL(username: username) { _ in }
+                                
                             case .failure(let error):
                                 print("Ошибка загрузки профиля: \(error.localizedDescription)")
                             }

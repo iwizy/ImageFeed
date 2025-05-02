@@ -10,6 +10,7 @@ final class ProfileViewController: UIViewController {
     
     // MARK: - Properties
     private let profileService = ProfileService.shared
+    private let profileImageService = ProfileImageService.shared
     
     private var profileResult: ProfileResult? {
         didSet {
@@ -20,6 +21,16 @@ final class ProfileViewController: UIViewController {
     private var currentProfile: Profile? {
         guard let profileResult = profileResult else { return nil }
         return Profile(ProfileResult: profileResult)
+    }
+    
+    private var profileImageServiceObserver: NSObjectProtocol?
+    
+    private func updateAvatar() {
+        guard
+            let profileImageURL = ProfileImageService.shared.avatarURL,
+            let url = URL(string: profileImageURL)
+        else { return }
+        
     }
     
     // MARK: - UI Elements
@@ -72,6 +83,22 @@ final class ProfileViewController: UIViewController {
         setupViews()
         setupConstraints()
         updateProfileData()
+        profileImageServiceObserver = NotificationCenter.default
+            .addObserver(
+                forName: ProfileImageService.DidChangeNotification,
+                object: nil,
+                queue: .main
+            ) { [weak self] _ in
+                guard let self = self else { return }
+                self.updateAvatar()
+            }
+        updateAvatar()
+    }
+    
+    deinit {
+        if let observer = profileImageServiceObserver {
+            NotificationCenter.default.removeObserver(observer)
+        }
     }
     
     // MARK: - Private Methods
@@ -111,13 +138,13 @@ final class ProfileViewController: UIViewController {
     
     
     private func updateProfileData() {
-            guard let profile = profileService.profile else {
-                print("Нет данных профиля для отображения")
-                return
-            }
-            
-            nameLabel.text = profile.name
-            loginNameLabel.text = profile.loginName
-            descriptionLabel.text = profile.bio
+        guard let profile = profileService.profile else {
+            print("Нет данных профиля для отображения")
+            return
         }
+        
+        nameLabel.text = profile.name
+        loginNameLabel.text = profile.loginName
+        descriptionLabel.text = profile.bio
+    }
 }

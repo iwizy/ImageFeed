@@ -35,6 +35,9 @@ final class WebViewViewController: UIViewController {
     // Делегат для обработки событий авторизации
     weak var delegate: WebViewViewControllerDelegate?
     
+    // Наблюдатель за прогрессом загрузки с использованием нового KVO API
+    private var progressObservation: NSKeyValueObservation?
+    
     // MARK: Authorization
     
     // Загружает страницу авторизации Unsplash с необходимыми параметрами
@@ -90,49 +93,19 @@ final class WebViewViewController: UIViewController {
         super.viewWillAppear(animated)
         
         // Добавляем наблюдатель за изменением прогресса загрузки
-        // Наблюдаем за изменением свойства estimatedProgress у WKWebView
-        // чтобы обновлять индикатор прогресса
-        webView.addObserver(
-            self,
-            forKeyPath: #keyPath(WKWebView.estimatedProgress),
-            options: .new,
-            context: nil
-        )
+        progressObservation = webView.observe(\.estimatedProgress, options: [.new]) { [weak self] _, _ in
+                    self?.updateProgress()
+                }
     }
     
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         
         // Важно удалить наблюдатель при исчезновении контроллера, чтобы избежать утечек памяти
-        webView.removeObserver(
-            self,
-            forKeyPath: #keyPath(WKWebView.estimatedProgress),
-            context: nil
-        )
+        progressObservation = nil
     }
     
-    // MARK: Key-Value Observing
-    
-    // Обрабатывает изменения наблюдаемых свойств
-    override func observeValue(
-        forKeyPath keyPath: String?,
-        of object: Any?,
-        change: [NSKeyValueChangeKey: Any]?,
-        context: UnsafeMutableRawPointer?
-    ) {
-        // Проверяем, что изменение произошло именно в свойстве estimatedProgress
-        if keyPath == #keyPath(WKWebView.estimatedProgress) {
-            updateProgress()  // Обновляем индикатор прогресса
-        } else {
-            // Для других свойств вызываем родительскую реализацию
-            super.observeValue(
-                forKeyPath: keyPath,
-                of: object,
-                change: change,
-                context: context
-            )
-        }
-    }
+ 
 }
 
 // MARK: WKNavigationDelegate
