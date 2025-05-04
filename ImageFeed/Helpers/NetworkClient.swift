@@ -16,45 +16,7 @@ final class NetworkClient {
         self.decoder = decoder
     }
     
-    // MARK: - Main Request Methods
-    
-    // Старый метод (оставлен для совместимости)
-    func request<T: Decodable>(
-        _ request: Endpoint,
-        completion: @escaping (Result<T, NetworkError>) -> Void
-    ) -> URLSessionTask {
-        guard let urlRequest = makeURLRequest(from: request) else {
-            print("[NetworkClient] ❌ Failed to create URLRequest for request: \(request.path)")
-            completion(.failure(.invalidRequest))
-            return session.dataTask(with: URLRequest(url: URL(string: "about:blank")!))
-        }
-        
-        print("[NetworkClient] ⬆️ Sending \(request.method.rawValue) request to: \(urlRequest.url?.absoluteString ?? "nil")")
-        if let headers = urlRequest.allHTTPHeaderFields {
-            print("[NetworkClient] 📝 Headers: \(headers)")
-        }
-        if let body = request.body, let bodyString = String(data: body, encoding: .utf8) {
-            print("[NetworkClient] 📦 Request body: \(bodyString)")
-        }
-        
-        let task = session.dataTask(with: urlRequest) { [weak self] data, response, error in
-            guard let self = self else { return }
-            
-            DispatchQueue.main.async {
-                self.handleResponse(
-                    data: data,
-                    response: response,
-                    error: error,
-                    completion: completion
-                )
-            }
-        }
-        
-        task.resume()
-        return task
-    }
-    
-    // Новый метод objectTask
+    // MARK: - Main Request Method
     func objectTask<T: Decodable>(
         for request: Endpoint,
         completion: @escaping (Result<T, NetworkError>) -> Void
@@ -84,6 +46,7 @@ final class NetworkClient {
                 }
             } catch {
                 DispatchQueue.main.async {
+                    print("[NetworkClient] ❌ Connection error: \(error.localizedDescription)")
                     completion(.failure(.connectionError(error)))
                 }
             }
@@ -91,43 +54,6 @@ final class NetworkClient {
         
         task.resume()
         return task
-    }
-    
-    // MARK: - HTTP Methods
-    func get<T: Decodable>(
-        path: String,
-        baseURL: URL? = nil,
-        queryItems: [URLQueryItem]? = nil,
-        headers: [String: String]? = nil,
-        completion: @escaping (Result<T, NetworkError>) -> Void
-    ) -> URLSessionTask {
-        let request = Endpoint(
-            path: path,
-            method: .get,
-            baseURL: baseURL,
-            headers: headers,
-            queryItems: queryItems,
-            body: nil
-        )
-        return objectTask(for: request, completion: completion)
-    }
-    
-    func post<T: Decodable>(
-        path: String,
-        baseURL: URL? = nil,
-        body: Data? = nil,
-        headers: [String: String]? = nil,
-        completion: @escaping (Result<T, NetworkError>) -> Void
-    ) -> URLSessionTask {
-        let request = Endpoint(
-            path: path,
-            method: .post,
-            baseURL: baseURL,
-            headers: headers,
-            queryItems: nil,
-            body: body
-        )
-        return objectTask(for: request, completion: completion)
     }
     
     // MARK: - Private Methods
@@ -150,10 +76,11 @@ final class NetworkClient {
         request.headers?.forEach { key, value in
             urlRequest.setValue(value, forHTTPHeaderField: key)
         }
-        
+        print("[NetworkClient] Request headers: \(urlRequest.allHTTPHeaderFields ?? [:])")
         return urlRequest
     }
     
+    // Обработка HTTP статус-кодов
     private func handleResponse<T: Decodable>(
         data: Data?,
         response: URLResponse?,
@@ -175,42 +102,39 @@ final class NetworkClient {
         print("[NetworkClient] ⬇️ Received response from: \(httpResponse.url?.absoluteString ?? "nil")")
         print("[NetworkClient] 📊 Status code: \(httpResponse.statusCode)")
         
-        if let headers = httpResponse.allHeaderFields as? [String: Any] {
-            print("[NetworkClient] 📝 Response headers: \(headers)")
-        }
+        let statusCode = httpResponse.statusCode
         
-        guard let data = data else {
-            print("[NetworkClient] ❌ No data received")
-            completion(.failure(.noDataReceived))
-            return
-        }
-        
-        if let responseBody = String(data: data, encoding: .utf8) {
-            print("[NetworkClient] 📦 Response body: \(responseBody)")
-        }
-        
-        switch httpResponse.statusCode {
+        switch statusCode {
         case 200..<300:
+            guard let data = data else {
+                print("[NetworkClient] ❌ No data received")
+                completion(.failure(.noDataReceived))
+                return
+            }
+            
             do {
                 let decodedObject = try decoder.decode(T.self, from: data)
                 print("[NetworkClient] ✅ Successfully decoded response")
                 completion(.success(decodedObject))
             } catch {
-                print("[NetworkClient] ❌ Decoding error: \(error)")
+                let responseBody = String(data: data, encoding: .utf8) ?? "nil"
+                print("""
+                [NetworkClient] ❌ Decoding error:
+                - Error: \(error.localizedDescription)
+                - Data: \(responseBody)
+                """)
                 completion(.failure(.decodingError(error)))
             }
+            
         case 300..<400:
-            print("[NetworkClient] ⚠️ Redirection status code: \(httpResponse.statusCode)")
-            completion(.failure(.redirection(code: httpResponse.statusCode)))
+            completion(.failure(.redirection(code: statusCode)))
         case 400..<500:
-            print("[NetworkClient] ❌ Client error: \(httpResponse.statusCode)")
-            completion(.failure(.clientError(code: httpResponse.statusCode, data: data)))
+            // Передаем данные ошибки для последующего парсинга
+            completion(.failure(.clientError(code: statusCode, data: data)))
         case 500..<600:
-            print("[NetworkClient] ❌ Server error: \(httpResponse.statusCode)")
-            completion(.failure(.serverError(code: httpResponse.statusCode)))
+            completion(.failure(.serverError(code: statusCode)))
         default:
-            print("[NetworkClient] ❓ Unknown status code: \(httpResponse.statusCode)")
-            completion(.failure(.unknownStatusCode(code: httpResponse.statusCode)))
+            completion(.failure(.unknownStatusCode(code: statusCode)))
         }
     }
 }
@@ -218,11 +142,7 @@ final class NetworkClient {
 // MARK: - Supporting Types
 extension NetworkClient {
     enum HTTPMethod: String {
-        case get = "GET"
-        case post = "POST"
-        case put = "PUT"
-        case patch = "PATCH"
-        case delete = "DELETE"
+        case get = "GET", post = "POST", put = "PUT", patch = "PATCH", delete = "DELETE"
     }
     
     struct Endpoint {
@@ -233,6 +153,7 @@ extension NetworkClient {
         let queryItems: [URLQueryItem]?
         let body: Data?
         
+        // Значения по умолчанию для всех параметров
         init(
             path: String,
             method: HTTPMethod,
@@ -251,23 +172,19 @@ extension NetworkClient {
     }
     
     enum NetworkError: Error {
-        case invalidRequest
-        case connectionError(Error)
-        case noDataReceived
-        case invalidResponse
-        case decodingError(Error)
-        case redirection(code: Int)
-        case clientError(code: Int, data: Data?)
-        case serverError(code: Int)
-        case unknownStatusCode(code: Int)
-        
-        var localizedDescription: String {
-            switch self {
-            case .clientError(let code, let data):
-                return "Client error \(code): \(String(data: data ?? Data(), encoding: .utf8) ?? "")"
-            default:
-                return "Network error occurred"
-            }
-        }
+        case invalidRequest, connectionError(Error), noDataReceived, invalidResponse
+        case decodingError(Error), redirection(code: Int), clientError(code: Int, data: Data?)
+        case serverError(code: Int), unknownStatusCode(code: Int)
+    }
+}
+
+// Структура для парсинга ошибок API
+struct APIError: Decodable {
+    let error: String
+    let errorDescription: String
+    
+    enum CodingKeys: String, CodingKey {
+        case error
+        case errorDescription = "error_description"
     }
 }

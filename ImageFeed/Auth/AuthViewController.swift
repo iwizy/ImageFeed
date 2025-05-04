@@ -16,7 +16,7 @@ protocol AuthViewControllerDelegate: AnyObject {
 // Контроллер для экрана авторизации, управляет процессом OAuth аутентификации
 final class AuthViewController: UIViewController {
     
-
+    
     // MARK: Constants
     // Идентификатор перехода к WebView
     private let showWebViewSegueIdentifier = "ShowWebView"
@@ -56,7 +56,7 @@ final class AuthViewController: UIViewController {
     // MARK: Navigation
     
     // Подготавливает данные перед переходом на другой экран
-
+    
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         // Проверяем идентификатор перехода
         if segue.identifier == showWebViewSegueIdentifier {
@@ -87,5 +87,17 @@ extension AuthViewController: WebViewViewControllerDelegate {
     func webViewViewControllerDidCancel(_ vc: WebViewViewController) {
         // Закрываем экран авторизации
         dismiss(animated: true)
+    }
+    
+    func showErrorAlert() {
+        let alert = UIAlertController(
+            title: "Что-то пошло не так(",
+            message: "Не удалось войти в систему",
+            preferredStyle: .alert)
+        let action = UIAlertAction(title: "Ок", style: .default) { _ in
+            alert.dismiss(animated: true)
+        }
+        alert.addAction(action)
+        present(alert, animated: true)
     }
 }

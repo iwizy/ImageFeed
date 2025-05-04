@@ -12,7 +12,7 @@ final class SplashViewController: UIViewController {
     private let tokenStorage = OAuth2TokenStorage()
     private let profileImageService = ProfileImageService.shared
     
-    // MARK: Lifecycle
+    // MARK: - Lifecycle
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
@@ -33,7 +33,7 @@ final class SplashViewController: UIViewController {
         return .lightContent
     }
     
-    // MARK: Private Methods
+    // MARK: - Private Methods
     
     private func isAuthenticated() -> Bool {
         guard let token = tokenStorage.token else {
@@ -60,16 +60,13 @@ final class SplashViewController: UIViewController {
         }
         
         if let profile = profileService.profile {
-            // Если профиль уже загружен, сразу переходим
             self.navigateToTabBarController()
             print("Профиль уже загружен")
             
-            // Безопасное извлечение username
             if let username = profile.username {
                 ProfileImageService.shared.fetchProfileImageURL(username: username) { _ in }
             }
         } else {
-            // Если нет - загружаем
             profileService.fetchProfile(token) { [weak self] result in
                 DispatchQueue.main.async {
                     switch result {
@@ -95,7 +92,7 @@ final class SplashViewController: UIViewController {
     }
 }
 
-// MARK: Navigation
+// MARK: - Navigation
 
 extension SplashViewController {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -111,16 +108,16 @@ extension SplashViewController {
     }
 }
 
-// MARK: AuthViewControllerDelegate
+// MARK: - AuthViewControllerDelegate
 
 extension SplashViewController: AuthViewControllerDelegate {
     func authViewController(_ vc: AuthViewController, didAuthenticateWith code: String) {
         dismiss(animated: true) {
-            self.fetchOAuthToken(code)
+            self.fetchOAuthToken(code, authViewController: vc)
         }
     }
     
-    private func fetchOAuthToken(_ code: String) {
+    private func fetchOAuthToken(_ code: String, authViewController: AuthViewController) {
         UIBlockingProgressHUD.show()
         oauth2Service.fetchOAuthToken(code: code) { [weak self] result in
             DispatchQueue.main.async {
@@ -131,7 +128,7 @@ extension SplashViewController: AuthViewControllerDelegate {
                 switch result {
                 case .success:
                     guard let token = self.tokenStorage.token else {
-                        print("Токен не сохранился")
+                        authViewController.showErrorAlert()
                         return
                     }
                     
@@ -139,23 +136,22 @@ extension SplashViewController: AuthViewControllerDelegate {
                         DispatchQueue.main.async {
                             switch result {
                             case .success:
-                                // Проверку на наличие username
                                 guard let profile = self.profileService.profile,
                                       let username = profile.username else {
-                                    print("Профиль или username не загружены")
+                                    authViewController.showErrorAlert()
                                     return
                                 }
                                 
                                 self.navigateToTabBarController()
                                 ProfileImageService.shared.fetchProfileImageURL(username: username) { _ in }
                                 
-                            case .failure(let error):
-                                print("Ошибка загрузки профиля: \(error.localizedDescription)")
+                            case .failure:
+                                authViewController.showErrorAlert()
                             }
                         }
                     }
-                case .failure(let error):
-                    print("[OAuthViewController] Ошибка получения OAuth токена: \(error.localizedDescription)")
+                case .failure:
+                    authViewController.showErrorAlert()
                 }
             }
         }

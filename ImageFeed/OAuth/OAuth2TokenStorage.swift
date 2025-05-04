@@ -13,12 +13,16 @@ final class OAuth2TokenStorage {
     private(set) var token: String? {
         get {
             // Получаем токен из стандартного хранилища UserDefaults
-            return UserDefaults.standard.string(forKey: "accessToken")
+            let token = UserDefaults.standard.string(forKey: "accessToken")
+            print("[TokenStorage] Retrieved token: \(token ?? "nil")")
+            return token
+            
         }
         set {
             // Сохраняем новое значение токена в UserDefaults
             // Если newValue = nil, запись автоматически удаляется
             UserDefaults.standard.set(newValue, forKey: "accessToken")
+            print("[TokenStorage] Saved token: \(newValue ?? "nil")")
         }
     }
     

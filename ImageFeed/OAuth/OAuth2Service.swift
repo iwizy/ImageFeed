@@ -7,7 +7,6 @@ import Foundation
 
 final class OAuth2Service {
     // MARK: - Error Types
-    // Система ошибок для более понятных сообщений
     enum ServiceError: LocalizedError {
         case invalidRequest
         case invalidGrant(description: String)
@@ -15,36 +14,30 @@ final class OAuth2Service {
         
         var errorDescription: String? {
             switch self {
-            case .invalidRequest:
-                return "Неверный запрос"
-            case .invalidGrant(let description):
-                return "Ошибка авторизации: \(description)"
-            case .otherError(let message):
-                return message
+            case .invalidRequest: return "Неверный запрос"
+            case .invalidGrant(let description): return "Ошибка авторизации: \(description)"
+            case .otherError(let message): return message
             }
         }
     }
     
-    // Структура для отслеживания активных запросов
+    // MARK: - Properties
     private struct ActiveAuthRequest {
         let task: URLSessionTask
         let authCode: String
     }
     
-    // MARK: - Configuration
     static let shared = OAuth2Service()
     private let tokenStorage = OAuth2TokenStorage()
     private let networkClient: NetworkClient
-
     private let baseURL = URL(string: "https://unsplash.com")!
+    private var currentAuthRequest: ActiveAuthRequest?
     
-    private init(networkClient: NetworkClient = NetworkClient()) {
+    // MARK: - Init
+    init(networkClient: NetworkClient = NetworkClient()) {
         self.networkClient = networkClient
     }
     
-    // Отслеживание текущего запроса
-    private var currentAuthRequest: ActiveAuthRequest?
-
     // MARK: - Main Method
     func fetchOAuthToken(
         code: String,
@@ -52,23 +45,21 @@ final class OAuth2Service {
     ) {
         assert(Thread.isMainThread)
         
-        // Обработка активных запросов
         if let currentRequest = currentAuthRequest {
             if currentRequest.authCode == code {
                 currentRequest.task.cancel()
-                print("[OAuth2Service] Отменен предыдущий запрос для кода: \(code)")
+                print("[OAuth2Service] ❌ Отменен предыдущий запрос для кода: \(code)")
             }
             completion(.failure(ServiceError.invalidRequest))
             return
         }
         
-        // Формирование тела запроса
         guard let body = makeTokenRequestBody(code: code) else {
+            print("[OAuth2Service] ❌ Invalid request body")
             completion(.failure(ServiceError.invalidRequest))
             return
         }
         
-        // Создание endpoint
         let endpoint = NetworkClient.Endpoint(
             path: "/oauth/token",
             method: .post,
@@ -77,23 +68,17 @@ final class OAuth2Service {
             body: body
         )
         
-        print("[OAuth2Service] Отправка запроса для кода: \(code)")
-        
         let task = networkClient.objectTask(for: endpoint) { [weak self] (result: Result<OAuthTokenResponseBody, NetworkClient.NetworkError>) in
-            guard let self = self else { return }
-            
             DispatchQueue.main.async {
-                self.currentAuthRequest = nil
-                
+                self?.currentAuthRequest = nil
                 switch result {
                 case .success(let response):
-                    self.tokenStorage.storeToken(response.accessToken)
+                    self?.tokenStorage.storeToken(response.accessToken)
                     completion(.success(response.accessToken))
-                    
                 case .failure(let error):
-                    // Парсинг ошибок
-                    let serviceError = self.parseNetworkError(error)
-                    print("[OAuth2Service] Ошибка: \(serviceError.localizedDescription)")
+                    // Преобразование NetworkError в ServiceError
+                    let serviceError = self?.parseNetworkError(error) ?? ServiceError.otherError(message: error.localizedDescription)
+                    print("[OAuth2Service] ❌ Error: \(serviceError.localizedDescription)")
                     completion(.failure(serviceError))
                 }
             }
@@ -103,7 +88,6 @@ final class OAuth2Service {
     }
     
     // MARK: - Private Helpers
-    // Метод формирования тела запроса
     private func makeTokenRequestBody(code: String) -> Data? {
         let parameters = [
             "client_id": Constants.accessKey,
@@ -112,23 +96,12 @@ final class OAuth2Service {
             "code": code,
             "grant_type": "authorization_code"
         ]
-        
-        // Кодирование параметров
-        var components = URLComponents()
-        components.queryItems = parameters.map {
-            URLQueryItem(name: $0.key, value: $0.value)
-        }
-        
-        guard let query = components.query else {
-            print("[OAuth2Service] Не удалось создать query строку")
-            return nil
-        }
-        
-        print("[OAuth2Service] Параметры запроса: \(parameters)")
-        return query.data(using: .utf8)
+        return parameters
+            .map { "\($0.key)=\($0.value)" }
+            .joined(separator: "&")
+            .data(using: .utf8)
     }
     
-    // Детальный парсинг ошибок
     private func parseNetworkError(_ error: NetworkClient.NetworkError) -> ServiceError {
         switch error {
         case .clientError(_, let data):
@@ -138,15 +111,11 @@ final class OAuth2Service {
                   let description = json["error_description"] as? String else {
                 return .otherError(message: "Неизвестная ошибка сервера")
             }
-            
-            if errorType == "invalid_grant" {
-                return .invalidGrant(description: description)
-            }
-            return .otherError(message: description)
-            
+            return errorType == "invalid_grant" ? .invalidGrant(description: description) : .otherError(message: description)
         case .decodingError(let error):
             return .otherError(message: "Ошибка декодирования: \(error.localizedDescription)")
-            
+        case .connectionError(let error):
+            return .otherError(message: "Ошибка соединения: \(error.localizedDescription)")
         default:
             return .otherError(message: "Сетевая ошибка: \(error.localizedDescription)")
         }

@@ -5,24 +5,28 @@
 
 import Foundation
 
+enum ProfileImageServiceError: Error {
+    case tokenNotFound
+    case urlNotFound
+}
+
 final class ProfileImageService {
     static let shared = ProfileImageService()
     private init() {}
     
     private let tokenStorage = OAuth2TokenStorage()
     private let networkClient: NetworkClient = NetworkClient()
-    
     private let syncQueue = DispatchQueue(label: "profile-image-service-sync-queue", attributes: .concurrent)
     private var _avatarURL: String?
     private var _currentTask: URLSessionTask?
     
     private(set) var avatarURL: String? {
-        get { syncQueue.sync(flags: .barrier) { _avatarURL } }
+        get { syncQueue.sync { _avatarURL } }
         set { syncQueue.async(flags: .barrier) { [weak self] in self?._avatarURL = newValue } }
     }
     
     private var currentTask: URLSessionTask? {
-        get { syncQueue.sync(flags: .barrier) { _currentTask } }
+        get { syncQueue.sync { _currentTask } }
         set { syncQueue.async(flags: .barrier) { [weak self] in self?._currentTask = newValue } }
     }
     
@@ -31,7 +35,8 @@ final class ProfileImageService {
         currentTask?.cancel()
         
         guard let token = tokenStorage.token else {
-            completion(.failure(NSError(domain: "ProfileImageService", code: -1, userInfo: [NSLocalizedDescriptionKey: "Token not found"])))
+            print("[ProfileImageService] ❌ Error: Token not found")
+            completion(.failure(ProfileImageServiceError.tokenNotFound))
             return
         }
         
@@ -49,9 +54,11 @@ final class ProfileImageService {
                         self?.avatarURL = url
                         completion(.success(url))
                     } else {
-                        completion(.failure(NSError(domain: "ProfileImageService", code: -2, userInfo: [NSLocalizedDescriptionKey: "URL not found"])))
+                        print("[ProfileImageService] ❌ Error: URL not found")
+                        completion(.failure(ProfileImageServiceError.urlNotFound))
                     }
                 case .failure(let error):
+                    print("[ProfileImageService] ❌ Error: \(error.localizedDescription)")
                     completion(.failure(error))
                 }
                 self?.currentTask = nil
