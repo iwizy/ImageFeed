@@ -101,7 +101,7 @@ final class WebViewViewController: UIViewController {
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         
-        // Важно удалить наблюдатель при исчезновении контроллера, чтобы избежать утечек памяти
+        // Удаляем наблюдатель при исчезновении контроллера, чтобы избежать утечек памяти
         progressObservation = nil
     }
     

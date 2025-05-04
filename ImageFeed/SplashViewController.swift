@@ -64,7 +64,7 @@ final class SplashViewController: UIViewController {
             self.navigateToTabBarController()
             print("Профиль уже загружен")
             
-            // ИСПРАВЛЕНИЕ: Добавил безопасное извлечение username
+            // Безопасное извлечение username
             if let username = profile.username {
                 ProfileImageService.shared.fetchProfileImageURL(username: username) { _ in }
             }
@@ -83,7 +83,6 @@ final class SplashViewController: UIViewController {
                         
                         self?.navigateToTabBarController()
                         print("Профиль успешно загружен")
-                        // ИСПРАВЛЕНИЕ: Теперь username точно есть
                         ProfileImageService.shared.fetchProfileImageURL(username: username) { _ in }
                         
                     case .failure(let error):
@@ -140,7 +139,7 @@ extension SplashViewController: AuthViewControllerDelegate {
                         DispatchQueue.main.async {
                             switch result {
                             case .success:
-                                // ИСПРАВЛЕНИЕ: Добавил проверку на наличие username
+                                // Проверку на наличие username
                                 guard let profile = self.profileService.profile,
                                       let username = profile.username else {
                                     print("Профиль или username не загружены")
@@ -148,7 +147,6 @@ extension SplashViewController: AuthViewControllerDelegate {
                                 }
                                 
                                 self.navigateToTabBarController()
-                                // ИСПРАВЛЕНИЕ: Теперь username точно есть
                                 ProfileImageService.shared.fetchProfileImageURL(username: username) { _ in }
                                 
                             case .failure(let error):

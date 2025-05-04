@@ -30,6 +30,7 @@ final class ProfileViewController: UIViewController {
             let profileImageURL = ProfileImageService.shared.avatarURL,
             let url = URL(string: profileImageURL)
         else { return }
+        print(profileImageURL)
         
     }
     

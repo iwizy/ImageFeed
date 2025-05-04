@@ -16,22 +16,24 @@ final class NetworkClient {
         self.decoder = decoder
     }
     
-    // MARK: - Main Request Method
+    // MARK: - Main Request Methods
+    
+    // Старый метод (оставлен для совместимости)
     func request<T: Decodable>(
-        _ endpoint: Endpoint,
+        _ request: Endpoint,
         completion: @escaping (Result<T, NetworkError>) -> Void
     ) -> URLSessionTask {
-        guard let urlRequest = makeURLRequest(from: endpoint) else {
-            print("[NetworkClient] ❌ Failed to create URLRequest for endpoint: \(endpoint.path)")
+        guard let urlRequest = makeURLRequest(from: request) else {
+            print("[NetworkClient] ❌ Failed to create URLRequest for request: \(request.path)")
             completion(.failure(.invalidRequest))
             return session.dataTask(with: URLRequest(url: URL(string: "about:blank")!))
         }
         
-        print("[NetworkClient] ⬆️ Sending \(endpoint.method.rawValue) request to: \(urlRequest.url?.absoluteString ?? "nil")")
+        print("[NetworkClient] ⬆️ Sending \(request.method.rawValue) request to: \(urlRequest.url?.absoluteString ?? "nil")")
         if let headers = urlRequest.allHTTPHeaderFields {
             print("[NetworkClient] 📝 Headers: \(headers)")
         }
-        if let body = endpoint.body, let bodyString = String(data: body, encoding: .utf8) {
+        if let body = request.body, let bodyString = String(data: body, encoding: .utf8) {
             print("[NetworkClient] 📦 Request body: \(bodyString)")
         }
         
@@ -52,6 +54,45 @@ final class NetworkClient {
         return task
     }
     
+    // Новый метод objectTask
+    func objectTask<T: Decodable>(
+        for request: Endpoint,
+        completion: @escaping (Result<T, NetworkError>) -> Void
+    ) -> URLSessionTask {
+        guard let urlRequest = makeURLRequest(from: request) else {
+            print("[NetworkClient] ❌ Failed to create URLRequest for request: \(request.path)")
+            completion(.failure(.invalidRequest))
+            return session.dataTask(with: URLRequest(url: URL(string: "about:blank")!))
+        }
+        
+        print("[NetworkClient] ⬆️ Sending \(request.method.rawValue) request to: \(urlRequest.url?.absoluteString ?? "nil")")
+        
+        let task = session.dataTask(with: urlRequest) { _, _, _ in }
+        
+        Task {
+            do {
+                let (data, response) = try await session.data(for: urlRequest)
+                
+                DispatchQueue.main.async { [weak self] in
+                    guard let self else { return }
+                    self.handleResponse(
+                        data: data,
+                        response: response,
+                        error: nil,
+                        completion: completion
+                    )
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    completion(.failure(.connectionError(error)))
+                }
+            }
+        }
+        
+        task.resume()
+        return task
+    }
+    
     // MARK: - HTTP Methods
     func get<T: Decodable>(
         path: String,
@@ -60,7 +101,7 @@ final class NetworkClient {
         headers: [String: String]? = nil,
         completion: @escaping (Result<T, NetworkError>) -> Void
     ) -> URLSessionTask {
-        let endpoint = Endpoint(
+        let request = Endpoint(
             path: path,
             method: .get,
             baseURL: baseURL,
@@ -68,7 +109,7 @@ final class NetworkClient {
             queryItems: queryItems,
             body: nil
         )
-        return request(endpoint, completion: completion)
+        return objectTask(for: request, completion: completion)
     }
     
     func post<T: Decodable>(
@@ -78,7 +119,7 @@ final class NetworkClient {
         headers: [String: String]? = nil,
         completion: @escaping (Result<T, NetworkError>) -> Void
     ) -> URLSessionTask {
-        let endpoint = Endpoint(
+        let request = Endpoint(
             path: path,
             method: .post,
             baseURL: baseURL,
@@ -86,31 +127,31 @@ final class NetworkClient {
             queryItems: nil,
             body: body
         )
-        return request(endpoint, completion: completion)
+        return objectTask(for: request, completion: completion)
     }
     
     // MARK: - Private Methods
-    private func makeURLRequest(from endpoint: Endpoint) -> URLRequest? {
+    private func makeURLRequest(from request: Endpoint) -> URLRequest? {
         var components = URLComponents()
         components.scheme = "https"
-        components.host = endpoint.baseURL?.host ?? Constants.defaultBaseURL?.host
-        components.path = endpoint.path
-        components.queryItems = endpoint.queryItems
+        components.host = request.baseURL?.host ?? Constants.defaultBaseURL?.host
+        components.path = request.path
+        components.queryItems = request.queryItems
         
         guard let url = components.url else {
             print("[NetworkClient] ❌ Failed to create URL from components")
             return nil
         }
         
-        var request = URLRequest(url: url)
-        request.httpMethod = endpoint.method.rawValue
-        request.httpBody = endpoint.body
+        var urlRequest = URLRequest(url: url)
+        urlRequest.httpMethod = request.method.rawValue
+        urlRequest.httpBody = request.body
         
-        endpoint.headers?.forEach { key, value in
-            request.setValue(value, forHTTPHeaderField: key)
+        request.headers?.forEach { key, value in
+            urlRequest.setValue(value, forHTTPHeaderField: key)
         }
         
-        return request
+        return urlRequest
     }
     
     private func handleResponse<T: Decodable>(
