@@ -5,24 +5,28 @@
 //  Хранилище токена
 
 import Foundation
+import SwiftKeychainWrapper
 
 // Используем UserDefaults в качестве хранилища
 final class OAuth2TokenStorage {
+    
+    private let keychainWrapper = KeychainWrapper.standard
     
     // MARK: Token Property
     private(set) var token: String? {
         get {
             // Получаем токен из стандартного хранилища UserDefaults
-            let token = UserDefaults.standard.string(forKey: "accessToken")
+            let token = keychainWrapper.string(forKey: "accessToken")
             print("[TokenStorage] Retrieved token: \(token ?? "nil")")
             return token
             
         }
         set {
+            guard let newValue else { return }
             // Сохраняем новое значение токена в UserDefaults
             // Если newValue = nil, запись автоматически удаляется
-            UserDefaults.standard.set(newValue, forKey: "accessToken")
-            print("[TokenStorage] Saved token: \(newValue ?? "nil")")
+            keychainWrapper.set(newValue, forKey: "accessToken")
+            print("[TokenStorage] Saved token: \(newValue)")
         }
     }
     
