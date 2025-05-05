@@ -5,6 +5,7 @@
 //  Класс вью контроллера профиля
 
 import UIKit
+import Kingfisher
 
 final class ProfileViewController: UIViewController {
     
@@ -30,13 +31,14 @@ final class ProfileViewController: UIViewController {
             let profileImageURL = ProfileImageService.shared.avatarURL,
             let url = URL(string: profileImageURL)
         else { return }
-        print(profileImageURL)
+        profileImage.kf.setImage(with: url,
+                                 placeholder: UIImage(named: "profile_image_placeholder"))
         
     }
     
     // MARK: - UI Elements
     private let profileImage: UIImageView = {
-        let imageView = UIImageView(image: UIImage(named: "profile_photo"))
+        let imageView = UIImageView(image: UIImage(named: "profile_image_placeholder"))
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.layer.cornerRadius = 35
         imageView.layer.masksToBounds = true

@@ -17,6 +17,6 @@ struct UserImage: Decodable {
     let currentUserImage: String?
     
     enum CodingKeys: String, CodingKey {
-        case currentUserImage = "small"
+        case currentUserImage = "large"
     }
 }
