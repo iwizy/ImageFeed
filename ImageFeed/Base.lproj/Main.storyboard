@@ -13,7 +13,7 @@
         <!--Tab Bar Controller-->
         <scene sceneID="WoQ-Un-6SH">
             <objects>
-                <tabBarController storyboardIdentifier="TabBarViewController" id="Orz-3x-Ucv" sceneMemberID="viewController">
+                <tabBarController storyboardIdentifier="TabBarViewController" id="Orz-3x-Ucv" customClass="TabBarController" customModule="ImageFeed" customModuleProvider="target" sceneMemberID="viewController">
                     <tabBar key="tabBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="VwH-Iy-scX">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="49"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -23,10 +23,6 @@
                             <color key="backgroundColor" name="YP Black"/>
                         </tabBarAppearance>
                     </tabBar>
-                    <connections>
-                        <segue destination="BYZ-38-t0r" kind="relationship" relationship="viewControllers" id="Qrf-DD-axo"/>
-                        <segue destination="9hK-i9-ozh" kind="relationship" relationship="viewControllers" id="oQ4-jJ-1o4"/>
-                    </connections>
                 </tabBarController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="P76-F3-wBd" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
@@ -86,7 +82,7 @@
         <!--ImageList-->
         <scene sceneID="tne-QT-ifu">
             <objects>
-                <viewController title="ImageList" id="BYZ-38-t0r" customClass="ImagesListViewController" customModule="ImageFeed" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="ImagesListViewController" title="ImageList" id="BYZ-38-t0r" customClass="ImagesListViewController" customModule="ImageFeed" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -172,7 +168,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1985.4961832061067" y="3.5211267605633805"/>
+            <point key="canvasLocation" x="60" y="335"/>
         </scene>
         <!--Single Image View Controller-->
         <scene sceneID="3Lt-i5-hGw">
@@ -243,23 +239,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="lTK-hM-NmB" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2918.320610687023" y="3.5211267605633805"/>
-        </scene>
-        <!--Profile View Controller-->
-        <scene sceneID="Y91-ZL-fAz">
-            <objects>
-                <viewController id="9hK-i9-ozh" customClass="ProfileViewController" customModule="ImageFeed" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="u17-L3-XNE">
-                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <viewLayoutGuide key="safeArea" id="4Kp-UC-RQ6"/>
-                        <color key="backgroundColor" name="YP Black"/>
-                    </view>
-                    <tabBarItem key="tabBarItem" title="" image="tab_profile_active" id="NfR-0P-gen"/>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="RyX-mo-ZF1" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="135" y="694"/>
+            <point key="canvasLocation" x="1063" y="335"/>
         </scene>
         <!--SplashViewController-->
         <scene sceneID="x8h-PX-mp5">
@@ -358,7 +338,6 @@
         <image name="backward" width="24" height="24"/>
         <image name="image_share_button" width="50.333332061767578" height="50"/>
         <image name="tab_editorial_active" width="30.333333969116211" height="30"/>
-        <image name="tab_profile_active" width="30.333333969116211" height="30"/>
         <namedColor name="YP Black">
             <color red="0.10196078431372549" green="0.10588235294117647" blue="0.13333333333333333" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
