@@ -12,7 +12,42 @@ final class SplashViewController: UIViewController {
     private let tokenStorage = OAuth2TokenStorage()
     private let profileImageService = ProfileImageService.shared
     
+    // MARK: - UI Elements
+    
+    private let splashLogo: UIImageView = {
+       let logoImageView = UIImageView(image: UIImage(named: "SplashLogo"))
+        logoImageView.translatesAutoresizingMaskIntoConstraints = false
+        return logoImageView
+    }()
+    
+    private func setupConstraints() {
+        NSLayoutConstraint.activate([
+            splashLogo.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: 0),
+            splashLogo.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: 0)
+        ])
+    }
+    
+    private func setupViews() {
+        view.addSubview(splashLogo)
+    }
+    
+    func loadAuthView() {
+        let storyboard = UIStoryboard(name: "Main", bundle: .main)
+            let viewController = storyboard.instantiateViewController(withIdentifier: "AuthViewController")
+            guard let viewController = viewController as? AuthViewController else { return }
+            viewController.delegate = self
+            viewController.modalPresentationStyle = .fullScreen
+            present(viewController, animated: true)
+    }
+    
     // MARK: - Lifecycle
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = UIColor(named: "YP Black")
+        setupViews()
+        setupConstraints()
+    }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
@@ -20,7 +55,7 @@ final class SplashViewController: UIViewController {
         if isAuthenticated() {
             loadProfileData()
         } else {
-            performSegue(withIdentifier: showAuthViewSegueIdentifier, sender: nil)
+            loadAuthView()
         }
     }
     

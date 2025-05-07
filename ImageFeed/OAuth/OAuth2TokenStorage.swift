@@ -11,6 +11,21 @@ import SwiftKeychainWrapper
 final class OAuth2TokenStorage {
     
     private let keychainWrapper = KeychainWrapper.standard
+    private let userDefaults = UserDefaults.standard
+    private let isFirstLaunchKey = "isFirstLaunch"
+    
+    init() {
+        checkFirstLaunch()
+    }
+    
+    private func checkFirstLaunch() {
+        if !userDefaults.bool(forKey: isFirstLaunchKey) {
+            // Первый запуск после установки
+            clearToken()
+            userDefaults.set(true, forKey: isFirstLaunchKey)
+            print("[TokenStorage] First launch detected, keychain cleared")
+        }
+    }
     
     // MARK: Token Property
     private(set) var token: String? {
@@ -22,11 +37,13 @@ final class OAuth2TokenStorage {
             
         }
         set {
-            guard let newValue else { return }
-            // Сохраняем новое значение токена в UserDefaults
-            // Если newValue = nil, запись автоматически удаляется
-            keychainWrapper.set(newValue, forKey: "accessToken")
-            print("[TokenStorage] Saved token: \(newValue)")
+            if let newValue = newValue {
+                keychainWrapper.set(newValue, forKey: "accessToken")
+                print("[TokenStorage] Saved token: \(newValue)")
+            } else {
+                keychainWrapper.removeObject(forKey: "accessToken")
+                print("[TokenStorage] Token removed")
+            }
         }
     }
     
