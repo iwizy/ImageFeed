@@ -7,7 +7,12 @@
 import UIKit
 
 final class SingleImageViewController: UIViewController {
-    
+    // MARK: - IB Outlets
+    @IBOutlet weak var scrollView: UIScrollView!
+    @IBOutlet weak var shareButton: UIButton!
+    @IBOutlet var imageView: UIImageView!
+
+    // MARK: - Public Properties
     // Свойство для хранения отображаемого изображения
     // didSet автоматически обновляет интерфейс при изменении изображения
     var image: UIImage? {
@@ -18,16 +23,15 @@ final class SingleImageViewController: UIViewController {
             rescaleAndCenterImageInScrollView(image: image) // Масштабируем и центрируем изображение в scrollView
         }
     }
-    
-    // MARK: - Outlets
-    @IBOutlet weak var scrollView: UIScrollView!
-    @IBOutlet weak var shareButton: UIButton!
-    @IBOutlet var imageView: UIImageView!
-    
+
+    // MARK: - Private Properties
     // Жесты для закрытия контроллера свайпом вниз и вправо
     private var swipeDownGesture: UISwipeGestureRecognizer?
     private var swipeRightGesture: UISwipeGestureRecognizer?
-    
+
+    // MARK: - Initializers
+
+    // MARK: - Overrides Methods
     override func viewDidLoad() {
         super.viewDidLoad()
         guard let image else { return } // Проверяем наличие изображения
@@ -38,7 +42,8 @@ final class SingleImageViewController: UIViewController {
         rescaleAndCenterImageInScrollView(image: image) // Масштабируем и центрируем изображение
         setupSwipeGestures()
     }
-    
+
+    // MARK: - IB Actions
     // Обработчик нажатия кнопки "Назад"
     @IBAction func backwardButton(_ sender: Any) {
         dismiss(animated: true, completion: nil) // Закрываем текущий контроллер
@@ -53,7 +58,8 @@ final class SingleImageViewController: UIViewController {
         )
         present(shareView, animated: true, completion: nil) // Показываем контроллер шеринга
     }
-    
+
+    // MARK: - Private Methods
     // Масштабирует и центрирует изображение в scrollView
     private func rescaleAndCenterImageInScrollView(image: UIImage) {
         // Получаем текущие настройки масштабирования
@@ -109,7 +115,7 @@ final class SingleImageViewController: UIViewController {
     }
 }
 
-// MARK: UIScrollViewDelegate
+// MARK: - Extensions
 
 extension SingleImageViewController: UIScrollViewDelegate {
     // Указываем какой view должен масштабироваться
@@ -140,8 +146,6 @@ extension SingleImageViewController: UIScrollViewDelegate {
         )
     }
 }
-
-// MARK: UIGestureRecognizerDelegate
 
 extension SingleImageViewController: UIGestureRecognizerDelegate {
     // Разрешаем одновременную работу нескольких жестов

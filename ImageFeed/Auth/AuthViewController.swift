@@ -5,6 +5,7 @@
 //  Класс вью контроллера авторизации
 
 import UIKit
+import ProgressHUD
 
 // Протокол делегата для обработки событий авторизации
 protocol AuthViewControllerDelegate: AnyObject {
@@ -15,15 +16,13 @@ protocol AuthViewControllerDelegate: AnyObject {
 // Контроллер для экрана авторизации, управляет процессом OAuth аутентификации
 final class AuthViewController: UIViewController {
     
-
-    // MARK: Constants
-    // Идентификатор перехода к WebView
-    private let showWebViewSegueIdentifier = "ShowWebView"
-    
+    // MARK: - Public Properties
     // Делегат для обработки событий авторизации
     weak var delegate: AuthViewControllerDelegate?
     
-    // MARK: UI Configuration
+    // MARK: - Private Properties
+    // Идентификатор перехода к WebView
+    private let showWebViewSegueIdentifier = "ShowWebView"
     
     // Настраивает кнопку "Назад" в navigation bar
     private func configureBackButton() {
@@ -43,19 +42,15 @@ final class AuthViewController: UIViewController {
         navigationItem.backBarButtonItem?.tintColor = UIColor(named: "YP Black")
     }
     
-    // MARK: View Lifecycle
-    
+    // MARK: - Overrides Methods
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         // Настраиваем UI при загрузке view
         configureBackButton()
+        navigationItem.hidesBackButton = true
     }
     
-    // MARK: Navigation
-    
     // Подготавливает данные перед переходом на другой экран
-
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         // Проверяем идентификатор перехода
         if segue.identifier == showWebViewSegueIdentifier {
@@ -73,7 +68,7 @@ final class AuthViewController: UIViewController {
     }
 }
 
-// MARK: WebViewViewControllerDelegate
+// MARK: Extensions
 
 extension AuthViewController: WebViewViewControllerDelegate {
     // Обрабатывает успешную авторизацию через WebView
@@ -86,5 +81,18 @@ extension AuthViewController: WebViewViewControllerDelegate {
     func webViewViewControllerDidCancel(_ vc: WebViewViewController) {
         // Закрываем экран авторизации
         dismiss(animated: true)
+    }
+    
+    // Показ алерта в случае ошибки
+    func showErrorAlert() {
+        let alert = UIAlertController(
+            title: "Что-то пошло не так(",
+            message: "Не удалось войти в систему",
+            preferredStyle: .alert)
+        let action = UIAlertAction(title: "Ок", style: .default) { _ in
+            alert.dismiss(animated: true)
+        }
+        alert.addAction(action)
+        present(alert, animated: true)
     }
 }
