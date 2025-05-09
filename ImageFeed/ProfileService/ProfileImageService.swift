@@ -2,6 +2,7 @@
 //  ProfileImageService.swift
 //  ImageFeed
 //
+// Сервис получение аватарки пользователя
 
 import Foundation
 
@@ -11,9 +12,10 @@ enum ProfileImageServiceError: Error {
 }
 
 final class ProfileImageService {
+    // MARK: - Public Properties
     static let shared = ProfileImageService()
-    private init() {}
-    
+
+    // MARK: - Private Properties
     private let tokenStorage = OAuth2TokenStorage()
     private let networkClient: NetworkClient = NetworkClient()
     private let syncQueue = DispatchQueue(label: "profile-image-service-sync-queue", attributes: .concurrent)
@@ -29,7 +31,11 @@ final class ProfileImageService {
         get { syncQueue.sync { _currentTask } }
         set { syncQueue.async(flags: .barrier) { [weak self] in self?._currentTask = newValue } }
     }
-    
+
+    // MARK: - Initializers
+    private init() {}
+
+    // MARK: - Public Methods
     func fetchProfileImageURL(username: String, _ completion: @escaping (Result<String, Error>) -> Void) {
         assert(Thread.isMainThread)
         currentTask?.cancel()
@@ -67,6 +73,7 @@ final class ProfileImageService {
     }
 }
 
+// MARK: - Extensions
 extension ProfileImageService {
     static let DidChangeNotification = Notification.Name("ProfileImageProviderDidChange")
 }

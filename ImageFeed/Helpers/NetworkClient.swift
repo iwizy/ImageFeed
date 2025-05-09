@@ -2,11 +2,12 @@
 //  NetworkClient.swift
 //  ImageFeed
 //
+// Сетевой клиент
 
 import Foundation
 
 final class NetworkClient {
-    // MARK: - Properties
+    // MARK: - Private properties
     private let session: URLSession
     private let decoder: JSONDecoder
     

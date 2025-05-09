@@ -9,8 +9,8 @@
 /* Begin PBXBuildFile section */
 		847566292DC94C0C0023B4A9 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 847566282DC94C0C0023B4A9 /* Kingfisher */; };
 		8475662C2DC960060023B4A9 /* SwiftKeychainWrapper in Frameworks */ = {isa = PBXBuildFile; productRef = 8475662B2DC960060023B4A9 /* SwiftKeychainWrapper */; };
+		8475667C2DCEA9A10023B4A9 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 84F21B002DAD26210097C940 /* WebKit.framework */; };
 		849D97492DBADC69009FAF45 /* ProgressHUD in Frameworks */ = {isa = PBXBuildFile; productRef = 849D97482DBADC69009FAF45 /* ProgressHUD */; };
-		84F21B012DAD26210097C940 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 84F21B002DAD26210097C940 /* WebKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -64,8 +64,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				847566292DC94C0C0023B4A9 /* Kingfisher in Frameworks */,
-				84F21B012DAD26210097C940 /* WebKit.framework in Frameworks */,
 				8475662C2DC960060023B4A9 /* SwiftKeychainWrapper in Frameworks */,
+				8475667C2DCEA9A10023B4A9 /* WebKit.framework in Frameworks */,
 				849D97492DBADC69009FAF45 /* ProgressHUD in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -2,8 +2,7 @@
 //  ProfileResult.swift
 //  ImageFeed
 //
-//  Created by Alexander Agafonov on 28.04.2025.
-//
+//  Структура данных полученного профиля
 
 import Foundation
 

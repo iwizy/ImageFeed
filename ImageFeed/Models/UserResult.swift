@@ -2,8 +2,7 @@
 //  UserResult.swift
 //  ImageFeed
 //
-//  Created by Alexander Agafonov on 01.05.2025.
-//
+//  Структура данных изображения профиля
 
 struct UserResult: Decodable {
     let profileImage: UserImage?

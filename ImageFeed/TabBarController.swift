@@ -2,8 +2,7 @@
 //  TabBarController.swift
 //  ImageFeed
 //
-//  Created by Alexander Agafonov on 06.05.2025.
-//
+//  Контроллер таббара
 
 import UIKit
 
@@ -25,5 +24,4 @@ final class TabBarController: UITabBarController {
         
         self.viewControllers = [imagesListViewController, profileViewController]
     }
-    
 }

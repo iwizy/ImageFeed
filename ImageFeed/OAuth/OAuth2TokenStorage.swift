@@ -9,15 +9,28 @@ import SwiftKeychainWrapper
 
 // Используем UserDefaults в качестве хранилища
 final class OAuth2TokenStorage {
-    
+    // MARK: - Private Properties
     private let keychainWrapper = KeychainWrapper.standard
     private let userDefaults = UserDefaults.standard
     private let isFirstLaunchKey = "isFirstLaunch"
-    
+
+    // MARK: - Initializers
     init() {
         checkFirstLaunch()
     }
+
+    // MARK: - Public Methods
+    // Сохраняет новый токен в хранилище.
+    func storeToken(_ newToken: String) {
+        self.token = newToken
+    }
     
+    // Удаляет текущий токен из хранилища.
+    func clearToken() {
+        self.token = nil
+    }
+
+    // MARK: - Private Methods
     private func checkFirstLaunch() {
         if !userDefaults.bool(forKey: isFirstLaunchKey) {
             // Первый запуск после установки
@@ -27,7 +40,6 @@ final class OAuth2TokenStorage {
         }
     }
     
-    // MARK: Token Property
     private(set) var token: String? {
         get {
             // Получаем токен из стандартного хранилища UserDefaults
@@ -45,18 +57,5 @@ final class OAuth2TokenStorage {
                 print("[TokenStorage] Token removed")
             }
         }
-    }
-    
-    // MARK: Public Methods
-    
-    // Сохраняет новый токен в хранилище.
-    
-    func storeToken(_ newToken: String) {
-        self.token = newToken
-    }
-    
-    // Удаляет текущий токен из хранилища.
-    func clearToken() {
-        self.token = nil
     }
 }

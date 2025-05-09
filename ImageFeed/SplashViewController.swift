@@ -2,46 +2,26 @@
 //  SplashViewController.swift
 //  ImageFeed
 //
+// Вью контроллер сплэша
 
 import UIKit
 
 final class SplashViewController: UIViewController {
+    // MARK: - Private Properties
     private let showAuthViewSegueIdentifier = "ShowAuthView"
     private let profileService = ProfileService.shared
     private let oauth2Service = OAuth2Service.shared
     private let tokenStorage = OAuth2TokenStorage()
     private let profileImageService = ProfileImageService.shared
     
-    // MARK: - UI Elements
-    
+    // UI Elements
     private let splashLogo: UIImageView = {
        let logoImageView = UIImageView(image: UIImage(named: "SplashLogo"))
         logoImageView.translatesAutoresizingMaskIntoConstraints = false
         return logoImageView
     }()
-    
-    private func setupConstraints() {
-        NSLayoutConstraint.activate([
-            splashLogo.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: 0),
-            splashLogo.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: 0)
-        ])
-    }
-    
-    private func setupViews() {
-        view.addSubview(splashLogo)
-    }
-    
-    func loadAuthView() {
-        let storyboard = UIStoryboard(name: "Main", bundle: .main)
-            let viewController = storyboard.instantiateViewController(withIdentifier: "AuthViewController")
-            guard let viewController = viewController as? AuthViewController else { return }
-            viewController.delegate = self
-            viewController.modalPresentationStyle = .fullScreen
-            present(viewController, animated: true)
-    }
-    
-    // MARK: - Lifecycle
-    
+
+    // MARK: - Overrides Methods
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor(named: "YP Black")
@@ -67,8 +47,28 @@ final class SplashViewController: UIViewController {
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .lightContent
     }
-    
+
+    // MARK: - Public Methods
+    func loadAuthView() {
+        let storyboard = UIStoryboard(name: "Main", bundle: .main)
+            let viewController = storyboard.instantiateViewController(withIdentifier: "AuthViewController")
+            guard let viewController = viewController as? AuthViewController else { return }
+            viewController.delegate = self
+            viewController.modalPresentationStyle = .fullScreen
+            present(viewController, animated: true)
+    }
+
     // MARK: - Private Methods
+    private func setupConstraints() {
+        NSLayoutConstraint.activate([
+            splashLogo.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: 0),
+            splashLogo.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: 0)
+        ])
+    }
+    
+    private func setupViews() {
+        view.addSubview(splashLogo)
+    }
     
     private func isAuthenticated() -> Bool {
         guard let token = tokenStorage.token else {
@@ -127,7 +127,7 @@ final class SplashViewController: UIViewController {
     }
 }
 
-// MARK: - Navigation
+// MARK: - Extensions
 
 extension SplashViewController {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -142,8 +142,6 @@ extension SplashViewController {
         }
     }
 }
-
-// MARK: - AuthViewControllerDelegate
 
 extension SplashViewController: AuthViewControllerDelegate {
     func authViewController(_ vc: AuthViewController, didAuthenticateWith code: String) {

@@ -26,20 +26,45 @@ protocol WebViewViewControllerDelegate: AnyObject {
 final class WebViewViewController: UIViewController {
     
     // MARK: Outlets
-    
     @IBOutlet private var webView: WKWebView!
     @IBOutlet private var progressView: UIProgressView!
     
-    // MARK: Properties
-    
+    // MARK: - Public Properties
     // Делегат для обработки событий авторизации
     weak var delegate: WebViewViewControllerDelegate?
     
+    // MARK: - Private Properties
     // Наблюдатель за прогрессом загрузки с использованием нового KVO API
     private var progressObservation: NSKeyValueObservation?
     
-    // MARK: Authorization
     
+    // MARK: - Overrides Methods
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        // Настраиваем WebView
+        webView.navigationDelegate = self  // Устанавливаем себя делегатом навигации
+        updateProgress()                   // Инициализируем прогресс-бар
+        loadAuthView()                     // Загружаем страницу авторизации
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        // Добавляем наблюдатель за изменением прогресса загрузки
+        progressObservation = webView.observe(\.estimatedProgress, options: [.new]) { [weak self] _, _ in
+            self?.updateProgress()
+        }
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        
+        // Удаляем наблюдатель при исчезновении контроллера, чтобы избежать утечек памяти
+        progressObservation = nil
+    }
+    
+    // MARK: - Private Methods
     // Загружает страницу авторизации Unsplash с необходимыми параметрами
     private func loadAuthView() {
         // Создаем компоненты URL из базового адреса авторизации
@@ -67,8 +92,6 @@ final class WebViewViewController: UIViewController {
         webView.load(request)
     }
     
-    // MARK: Progress Handling
-    
     // Обновляет состояние индикатора прогресса загрузки
     // Скрывает прогресс-бар когда загрузка завершена (прогресс ≈ 1.0)
     private func updateProgress() {
@@ -77,38 +100,9 @@ final class WebViewViewController: UIViewController {
         // Скрываем прогресс-бар при завершении загрузки (с учетом погрешности)
         progressView.isHidden = fabs(webView.estimatedProgress - 1.0) <= 0.0001
     }
-    
-    // MARK: View Lifecycle
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        // Настраиваем WebView
-        webView.navigationDelegate = self  // Устанавливаем себя делегатом навигации
-        updateProgress()                   // Инициализируем прогресс-бар
-        loadAuthView()                     // Загружаем страницу авторизации
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        // Добавляем наблюдатель за изменением прогресса загрузки
-        progressObservation = webView.observe(\.estimatedProgress, options: [.new]) { [weak self] _, _ in
-                    self?.updateProgress()
-                }
-    }
-    
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        
-        // Удаляем наблюдатель при исчезновении контроллера, чтобы избежать утечек памяти
-        progressObservation = nil
-    }
-    
- 
 }
 
-// MARK: WKNavigationDelegate
+// MARK: - Extensions
 
 extension WebViewViewController: WKNavigationDelegate {
     

@@ -9,7 +9,11 @@ import Kingfisher
 
 final class ProfileViewController: UIViewController {
     
-    // MARK: - Properties
+    // MARK: - IB Outlets
+
+    // MARK: - Public Properties
+
+    // MARK: - Private Properties
     private let profileService = ProfileService.shared
     private let profileImageService = ProfileImageService.shared
     
@@ -26,18 +30,7 @@ final class ProfileViewController: UIViewController {
     
     private var profileImageServiceObserver: NSObjectProtocol?
     
-    private func updateAvatar() {
-        guard
-            let profileImageURL = ProfileImageService.shared.avatarURL,
-            let url = URL(string: profileImageURL)
-        else { return }
-        profileImage.kf.indicatorType = .activity
-        profileImage.kf.setImage(with: url,
-                                 placeholder: UIImage(named: "profile_image_placeholder"))
-        
-    }
-    
-    // MARK: - UI Elements
+    // UI Elements
     private let profileImage: UIImageView = {
         let imageView = UIImageView(image: UIImage(named: "profile_image_placeholder"))
         imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -80,8 +73,15 @@ final class ProfileViewController: UIViewController {
         label.font = UIFont.systemFont(ofSize: 13, weight: .regular)
         return label
     }()
-    
-    // MARK: - Lifecycle
+
+    // MARK: - Initializers
+    deinit {
+        if let observer = profileImageServiceObserver {
+            NotificationCenter.default.removeObserver(observer)
+        }
+    }
+
+    // MARK: - Overrides Methods
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor(named: "YP Black")
@@ -99,14 +99,20 @@ final class ProfileViewController: UIViewController {
             }
         updateAvatar()
     }
-    
-    deinit {
-        if let observer = profileImageServiceObserver {
-            NotificationCenter.default.removeObserver(observer)
-        }
+
+
+    // MARK: - Private Methods
+    private func updateAvatar() {
+        guard
+            let profileImageURL = ProfileImageService.shared.avatarURL,
+            let url = URL(string: profileImageURL)
+        else { return }
+        profileImage.kf.indicatorType = .activity
+        profileImage.kf.setImage(with: url,
+                                 placeholder: UIImage(named: "profile_image_placeholder"))
+        
     }
     
-    // MARK: - Private Methods
     private func setupViews() {
         view.addSubview(profileImage)
         view.addSubview(logoutButton)
