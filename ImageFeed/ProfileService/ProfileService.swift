@@ -9,7 +9,7 @@ import Foundation
 final class ProfileService {
     // MARK: - Public Properties
     static let shared = ProfileService()
-
+    
     // MARK: - Private Properties
     private let tokenStorage = OAuth2TokenStorage()
     private let networkClient: NetworkClient = NetworkClient()
@@ -26,10 +26,10 @@ final class ProfileService {
         get { syncQueue.sync { _currentTask } }
         set { syncQueue.async(flags: .barrier) { [weak self] in self?._currentTask = newValue } }
     }
-
+    
     // MARK: - Initializers
     private init() {}
-
+    
     // MARK: - Private Methods
     func fetchProfile(_ token: String, completion: @escaping (Result<Profile, Error>) -> Void) {
         print("[ProfileService] Using token: \(token)")

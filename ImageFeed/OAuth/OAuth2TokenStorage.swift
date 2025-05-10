@@ -13,12 +13,12 @@ final class OAuth2TokenStorage {
     private let keychainWrapper = KeychainWrapper.standard
     private let userDefaults = UserDefaults.standard
     private let isFirstLaunchKey = "isFirstLaunch"
-
+    
     // MARK: - Initializers
     init() {
         checkFirstLaunch()
     }
-
+    
     // MARK: - Public Methods
     // Сохраняет новый токен в хранилище.
     func storeToken(_ newToken: String) {
@@ -29,7 +29,7 @@ final class OAuth2TokenStorage {
     func clearToken() {
         self.token = nil
     }
-
+    
     // MARK: - Private Methods
     private func checkFirstLaunch() {
         if !userDefaults.bool(forKey: isFirstLaunchKey) {

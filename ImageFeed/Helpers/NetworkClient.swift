@@ -25,14 +25,15 @@ final class NetworkClient {
         guard let urlRequest = makeURLRequest(from: request) else {
             print("[NetworkClient] ❌ Failed to create URLRequest for request: \(request.path)")
             completion(.failure(.invalidRequest))
-            return session.dataTask(with: URLRequest(url: URL(string: "about:blank")!))
+            return URLSessionDataTask() // fallback task
         }
         
         print("[NetworkClient] ⬆️ Sending \(request.method.rawValue) request to: \(urlRequest.url?.absoluteString ?? "nil")")
         
         let task = session.dataTask(with: urlRequest) { _, _, _ in }
         
-        Task {
+        Task { [weak self] in
+            guard let self else { return }
             do {
                 let (data, response) = try await session.data(for: urlRequest)
                 
@@ -103,16 +104,16 @@ final class NetworkClient {
         print("[NetworkClient] ⬇️ Received response from: \(httpResponse.url?.absoluteString ?? "nil")")
         print("[NetworkClient] 📊 Status code: \(httpResponse.statusCode)")
         
+        guard let data = data else {
+            print("[NetworkClient] ❌ No data received")
+            completion(.failure(.noDataReceived))
+            return
+        }
+        
         let statusCode = httpResponse.statusCode
         
         switch statusCode {
         case 200..<300:
-            guard let data = data else {
-                print("[NetworkClient] ❌ No data received")
-                completion(.failure(.noDataReceived))
-                return
-            }
-            
             do {
                 let decodedObject = try decoder.decode(T.self, from: data)
                 print("[NetworkClient] ✅ Successfully decoded response")
@@ -130,7 +131,6 @@ final class NetworkClient {
         case 300..<400:
             completion(.failure(.redirection(code: statusCode)))
         case 400..<500:
-            // Передаем данные ошибки для последующего парсинга
             completion(.failure(.clientError(code: statusCode, data: data)))
         case 500..<600:
             completion(.failure(.serverError(code: statusCode)))
@@ -154,7 +154,6 @@ extension NetworkClient {
         let queryItems: [URLQueryItem]?
         let body: Data?
         
-        // Значения по умолчанию для всех параметров
         init(
             path: String,
             method: HTTPMethod,

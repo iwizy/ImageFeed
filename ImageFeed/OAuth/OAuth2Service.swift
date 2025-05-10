@@ -33,8 +33,15 @@ final class OAuth2Service {
     
     private let tokenStorage = OAuth2TokenStorage()
     private let networkClient: NetworkClient
-    private let baseURL = URL(string: "https://unsplash.com")!
     private var currentAuthRequest: ActiveAuthRequest?
+    
+    private let baseURL: URL = {
+        guard let url = URL(string: "https://unsplash.com") else {
+            print("[OAuth2Service] ❌ Неправильный базовый URL")
+            fatalError("Invalid base URL")
+        }
+        return url
+    }()
     
     // MARK: - Initializers
     init(networkClient: NetworkClient = NetworkClient()) {
@@ -72,21 +79,23 @@ final class OAuth2Service {
         )
         
         let task = networkClient.objectTask(for: endpoint) { [weak self] (result: Result<OAuthTokenResponseBody, NetworkClient.NetworkError>) in
-            DispatchQueue.main.async {
-                self?.currentAuthRequest = nil
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
+                
+                self.currentAuthRequest = nil
+                
                 switch result {
                 case .success(let response):
-                    self?.tokenStorage.storeToken(response.accessToken)
+                    self.tokenStorage.storeToken(response.accessToken)
                     completion(.success(response.accessToken))
+                    
                 case .failure(let error):
-                    // Преобразование NetworkError в ServiceError
-                    let serviceError = self?.parseNetworkError(error) ?? ServiceError.otherError(message: error.localizedDescription)
+                    let serviceError = self.parseNetworkError(error) ?? ServiceError.otherError(message: error.localizedDescription)
                     print("[OAuth2Service] ❌ Error: \(serviceError.localizedDescription)")
                     completion(.failure(serviceError))
                 }
             }
         }
-        
         currentAuthRequest = ActiveAuthRequest(task: task, authCode: code)
     }
     

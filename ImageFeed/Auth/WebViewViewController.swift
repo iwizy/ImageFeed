@@ -38,7 +38,7 @@ final class WebViewViewController: UIViewController {
     private var progressObservation: NSKeyValueObservation?
     
     
-    // MARK: - Overrides Methods
+    // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         

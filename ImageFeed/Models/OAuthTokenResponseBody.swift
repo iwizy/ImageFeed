@@ -4,7 +4,6 @@
 //
 // Структура данных токена
 
-
 import Foundation
 
 struct OAuthTokenResponseBody: Decodable {

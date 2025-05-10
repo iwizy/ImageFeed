@@ -13,15 +13,16 @@ final class SplashViewController: UIViewController {
     private let oauth2Service = OAuth2Service.shared
     private let tokenStorage = OAuth2TokenStorage()
     private let profileImageService = ProfileImageService.shared
+    private var isAuthViewPresented = false
     
     // UI Elements
     private let splashLogo: UIImageView = {
-       let logoImageView = UIImageView(image: UIImage(named: "SplashLogo"))
+        let logoImageView = UIImageView(image: UIImage(named: "SplashLogo"))
         logoImageView.translatesAutoresizingMaskIntoConstraints = false
         return logoImageView
     }()
-
-    // MARK: - Overrides Methods
+    
+    // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor(named: "YP Black")
@@ -47,17 +48,22 @@ final class SplashViewController: UIViewController {
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .lightContent
     }
-
+    
     // MARK: - Public Methods
     func loadAuthView() {
+        guard !isAuthViewPresented else { return }
+        isAuthViewPresented = true
+        
         let storyboard = UIStoryboard(name: "Main", bundle: .main)
-            let viewController = storyboard.instantiateViewController(withIdentifier: "AuthViewController")
-            guard let viewController = viewController as? AuthViewController else { return }
-            viewController.delegate = self
-            viewController.modalPresentationStyle = .fullScreen
-            present(viewController, animated: true)
+        let viewController = storyboard.instantiateViewController(withIdentifier: "AuthViewController")
+        guard let viewController = viewController as? AuthViewController else { return }
+        viewController.delegate = self
+        viewController.modalPresentationStyle = .fullScreen
+        DispatchQueue.main.async {
+            self.present(viewController, animated: true)
+        }
     }
-
+    
     // MARK: - Private Methods
     private func setupConstraints() {
         NSLayoutConstraint.activate([
@@ -78,13 +84,22 @@ final class SplashViewController: UIViewController {
     }
     
     private func navigateToTabBarController() {
-        guard let window = UIApplication.shared.windows.first else {
-            fatalError("Invalid configuration: window not found")
+        guard
+            let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+            let window = windowScene.windows.first
+        else {
+            fatalError("Window not found")
         }
         
         let tabBarView = UIStoryboard(name: "Main", bundle: .main)
             .instantiateViewController(withIdentifier: "TabBarViewController")
+        
         window.rootViewController = tabBarView
+        window.makeKeyAndVisible()
+    }
+    
+    private func fetchAvatar(for username: String) {
+        ProfileImageService.shared.fetchProfileImageURL(username: username) { _ in }
     }
     
     private func loadProfileData() {
@@ -99,7 +114,7 @@ final class SplashViewController: UIViewController {
             print("Профиль уже загружен")
             
             if let username = profile.username {
-                ProfileImageService.shared.fetchProfileImageURL(username: username) { _ in }
+                self.fetchAvatar(for: username)
             }
         } else {
             profileService.fetchProfile(token) { [weak self] result in
@@ -115,7 +130,7 @@ final class SplashViewController: UIViewController {
                         
                         self?.navigateToTabBarController()
                         print("Профиль успешно загружен")
-                        ProfileImageService.shared.fetchProfileImageURL(username: username) { _ in }
+                        self?.fetchAvatar(for: username)
                         
                     case .failure(let error):
                         print("Ошибка загрузки профиля: \(error.localizedDescription)")
@@ -127,7 +142,7 @@ final class SplashViewController: UIViewController {
     }
 }
 
-// MARK: - Extensions
+// MARK: - Extensions: SplashViewController
 
 extension SplashViewController {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -143,50 +158,54 @@ extension SplashViewController {
     }
 }
 
+// MARK: - Extensions: SplashViewController: AuthViewControllerDelegate
 extension SplashViewController: AuthViewControllerDelegate {
     func authViewController(_ vc: AuthViewController, didAuthenticateWith code: String) {
-        dismiss(animated: true) {
-            self.fetchOAuthToken(code, authViewController: vc)
+        DispatchQueue.main.async { [weak self] in
+            self?.dismiss(animated: true) {
+                self?.isAuthViewPresented = false
+                self?.fetchOAuthToken(code, authViewController: vc)
+            }
         }
     }
     
     private func fetchOAuthToken(_ code: String, authViewController: AuthViewController) {
         UIBlockingProgressHUD.show()
+        
         oauth2Service.fetchOAuthToken(code: code) { [weak self] result in
             DispatchQueue.main.async {
                 UIBlockingProgressHUD.dismiss()
                 
-                guard let self = self else { return }
+                guard let self else { return }
                 
                 switch result {
                 case .success:
                     guard let token = self.tokenStorage.token else {
-                        authViewController.showErrorAlert()
+                        authViewController.showAuthErrorAlert()
                         return
                     }
-                    
                     self.profileService.fetchProfile(token) { result in
                         DispatchQueue.main.async {
                             switch result {
                             case .success:
                                 guard let profile = self.profileService.profile,
                                       let username = profile.username else {
-                                    authViewController.showErrorAlert()
+                                    authViewController.showAuthErrorAlert()
                                     return
                                 }
-                                
                                 self.navigateToTabBarController()
-                                ProfileImageService.shared.fetchProfileImageURL(username: username) { _ in }
+                                self.fetchAvatar(for: username)
                                 
                             case .failure:
-                                authViewController.showErrorAlert()
+                                authViewController.showAuthErrorAlert()
                             }
                         }
                     }
                 case .failure:
-                    authViewController.showErrorAlert()
+                    authViewController.showAuthErrorAlert()
                 }
             }
         }
     }
+    
 }

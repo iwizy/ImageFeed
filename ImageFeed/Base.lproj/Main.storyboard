@@ -31,7 +31,7 @@
         <!--AuthViewController-->
         <scene sceneID="7hj-0S-0xz">
             <objects>
-                <viewController storyboardIdentifier="AuthViewController" title="AuthViewController" id="9X2-cx-PQm" customClass="AuthViewController" customModule="ImageFeed" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="AuthViewController" title="AuthViewController" modalPresentationStyle="fullScreen" id="9X2-cx-PQm" customClass="AuthViewController" customModule="ImageFeed" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="Qvn-N4-YeM">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -244,13 +244,13 @@
         <!--WebViewViewController-->
         <scene sceneID="wdR-Gy-y1m">
             <objects>
-                <viewController title="WebViewViewController" id="nIk-1C-utQ" customClass="WebViewViewController" customModule="ImageFeed" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController title="WebViewViewController" modalPresentationStyle="fullScreen" id="nIk-1C-utQ" customClass="WebViewViewController" customModule="ImageFeed" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="e5l-vi-siG">
-                        <rect key="frame" x="0.0" y="0.0" width="393" height="783"/>
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <wkWebView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="oWQ-ba-t0w">
-                                <rect key="frame" x="16" y="59" width="361" height="724"/>
+                                <rect key="frame" x="16" y="59" width="361" height="759"/>
                                 <color key="backgroundColor" name="YP White"/>
                                 <wkWebViewConfiguration key="configuration">
                                     <audiovisualMediaTypes key="mediaTypesRequiringUserActionForPlayback" none="YES"/>

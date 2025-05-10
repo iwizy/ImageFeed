@@ -24,7 +24,7 @@ final class ImagesListViewController: UIViewController {
         return formatter
     }()
     
-    // MARK: - Overrides Methods
+    // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.rowHeight = 200
@@ -68,7 +68,6 @@ extension ImagesListViewController: UITableViewDataSource {
         return imageListCell
     }
 }
-
 
 extension ImagesListViewController {
     private func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {

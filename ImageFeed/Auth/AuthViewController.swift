@@ -42,7 +42,7 @@ final class AuthViewController: UIViewController {
         navigationItem.backBarButtonItem?.tintColor = UIColor(named: "YP Black")
     }
     
-    // MARK: - Overrides Methods
+    // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         // Настраиваем UI при загрузке view
@@ -68,8 +68,7 @@ final class AuthViewController: UIViewController {
     }
 }
 
-// MARK: Extensions
-
+// MARK: Extensions: AuthViewController: WebViewViewControllerDelegate
 extension AuthViewController: WebViewViewControllerDelegate {
     // Обрабатывает успешную авторизацию через WebView
     func webViewViewController(_ vc: WebViewViewController, didAuthenticateWithCode code: String) {
@@ -84,15 +83,19 @@ extension AuthViewController: WebViewViewControllerDelegate {
     }
     
     // Показ алерта в случае ошибки
-    func showErrorAlert() {
+    func showAuthErrorAlert() {
         let alert = UIAlertController(
             title: "Что-то пошло не так(",
             message: "Не удалось войти в систему",
             preferredStyle: .alert)
         let action = UIAlertAction(title: "Ок", style: .default) { _ in
-            alert.dismiss(animated: true)
+            DispatchQueue.main.async {
+                alert.dismiss(animated: true)
+            }
         }
         alert.addAction(action)
-        present(alert, animated: true)
+        DispatchQueue.main.async {
+            self.present(alert, animated: true)
+        }
     }
 }

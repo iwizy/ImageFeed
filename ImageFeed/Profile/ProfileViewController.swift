@@ -8,11 +8,6 @@ import UIKit
 import Kingfisher
 
 final class ProfileViewController: UIViewController {
-    
-    // MARK: - IB Outlets
-
-    // MARK: - Public Properties
-
     // MARK: - Private Properties
     private let profileService = ProfileService.shared
     private let profileImageService = ProfileImageService.shared
@@ -73,14 +68,14 @@ final class ProfileViewController: UIViewController {
         label.font = UIFont.systemFont(ofSize: 13, weight: .regular)
         return label
     }()
-
+    
     // MARK: - Initializers
     deinit {
         if let observer = profileImageServiceObserver {
             NotificationCenter.default.removeObserver(observer)
         }
     }
-
+    
     // MARK: - Overrides Methods
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -99,8 +94,7 @@ final class ProfileViewController: UIViewController {
             }
         updateAvatar()
     }
-
-
+    
     // MARK: - Private Methods
     private func updateAvatar() {
         guard
