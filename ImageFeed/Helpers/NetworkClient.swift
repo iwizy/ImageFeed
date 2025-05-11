@@ -25,7 +25,7 @@ final class NetworkClient {
         guard let urlRequest = makeURLRequest(from: request) else {
             print("[NetworkClient] ❌ Failed to create URLRequest for request: \(request.path)")
             completion(.failure(.invalidRequest))
-            return URLSessionDataTask() // fallback task
+            return URLSessionDataTask()
         }
         
         print("[NetworkClient] ⬆️ Sending \(request.method.rawValue) request to: \(urlRequest.url?.absoluteString ?? "nil")")
@@ -53,8 +53,6 @@ final class NetworkClient {
                 }
             }
         }
-        
-        task.resume()
         return task
     }
     

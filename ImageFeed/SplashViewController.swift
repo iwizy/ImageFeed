@@ -164,48 +164,67 @@ extension SplashViewController: AuthViewControllerDelegate {
         DispatchQueue.main.async { [weak self] in
             self?.dismiss(animated: true) {
                 self?.isAuthViewPresented = false
-                self?.fetchOAuthToken(code, authViewController: vc)
+                self?.fetchOAuthToken(code)
             }
         }
     }
     
-    private func fetchOAuthToken(_ code: String, authViewController: AuthViewController) {
+    private func fetchOAuthToken(_ code: String) {
         UIBlockingProgressHUD.show()
-        
+
         oauth2Service.fetchOAuthToken(code: code) { [weak self] result in
             DispatchQueue.main.async {
-                UIBlockingProgressHUD.dismiss()
-                
                 guard let self else { return }
-                
+
                 switch result {
                 case .success:
                     guard let token = self.tokenStorage.token else {
-                        authViewController.showAuthErrorAlert()
+                        UIBlockingProgressHUD.dismiss()
+                        self.showAuthErrorAlert()
                         return
                     }
+
                     self.profileService.fetchProfile(token) { result in
                         DispatchQueue.main.async {
                             switch result {
                             case .success:
                                 guard let profile = self.profileService.profile,
                                       let username = profile.username else {
-                                    authViewController.showAuthErrorAlert()
+                                    UIBlockingProgressHUD.dismiss()
+                                    self.showAuthErrorAlert()
                                     return
                                 }
+
+                                UIBlockingProgressHUD.dismiss() 
                                 self.navigateToTabBarController()
                                 self.fetchAvatar(for: username)
-                                
+
                             case .failure:
-                                authViewController.showAuthErrorAlert()
+                                UIBlockingProgressHUD.dismiss()
+                                self.showAuthErrorAlert()
                             }
                         }
                     }
+
                 case .failure:
-                    authViewController.showAuthErrorAlert()
+                    UIBlockingProgressHUD.dismiss()
+                    self.showAuthErrorAlert()
                 }
             }
         }
     }
+    
+    private func showAuthErrorAlert() {
+        let alert = UIAlertController(
+            title: "Что-то пошло не так(",
+            message: "Не удалось войти в систему",
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "Ок", style: .default))
+        DispatchQueue.main.async {
+            self.present(alert, animated: true)
+        }
+    }
+
     
 }
