@@ -2,8 +2,7 @@
 //  OAuthTokenResponseBody.swift
 //  ImageFeed
 //
-//  Created by Alexander Agafonov on 18.04.2025.
-//
+// Структура данных токена
 
 import Foundation
 
