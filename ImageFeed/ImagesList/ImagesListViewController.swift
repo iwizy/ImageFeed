@@ -73,7 +73,7 @@ final class ImagesListViewController: UIViewController {
                 assertionFailure("Invalid segue destination")
                 return
             }
-
+            
             let photo = photos[indexPath.row]
             if let url = URL(string: photo.largeImageURL) {
                 viewController.loadViewIfNeeded()
@@ -88,8 +88,6 @@ final class ImagesListViewController: UIViewController {
     }
 }
 
-
-
 // MARK: - UITableViewDataSource
 extension ImagesListViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -103,6 +101,7 @@ extension ImagesListViewController: UITableViewDataSource {
             return UITableViewCell()
         }
         
+        imageListCell.delegate = self
         configCell(for: imageListCell, with: indexPath)
         
         return imageListCell
@@ -117,6 +116,43 @@ extension ImagesListViewController: UITableViewDelegate {
         }
     }
 }
+
+// MARK: - ImagesListCellDelegate
+extension ImagesListViewController: ImagesListCellDelegate {
+    func imageListCellDidTapLike(_ cell: ImagesListCell) {
+        guard let indexPath = tableView.indexPath(for: cell) else { return }
+        let photo = photos[indexPath.row]
+        
+        UIBlockingProgressHUD.show()
+        
+        imagesListService.changeLike(photoId: photo.id, isLike: !photo.isLiked) { [weak self] result in
+            DispatchQueue.main.async {
+                UIBlockingProgressHUD.dismiss()
+                
+                guard let self = self else { return }
+                
+                switch result {
+                case .success:
+                    self.photos = self.imagesListService.photos
+                    let updatedPhoto = self.photos[indexPath.row]
+                    cell.setIsLiked(updatedPhoto.isLiked)
+                    
+                case .failure:
+                    let alert = UIAlertController(
+                        title: "Ошибка",
+                        message: "Не удалось изменить статус лайка. Попробуйте позже.",
+                        preferredStyle: .alert
+                    )
+                    alert.addAction(UIAlertAction(title: "ОК", style: .default))
+                    self.present(alert, animated: true)
+                }
+            }
+        }
+    }
+}
+
+
+
 
 // MARK: - Cell Configuration
 extension ImagesListViewController {

@@ -28,3 +28,7 @@ struct UrlsResult: Decodable {
     let thumb: String
     let full: String
 }
+
+struct LikeResult: Decodable {
+    let photo: PhotoResult
+}

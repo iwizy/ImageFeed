@@ -72,6 +72,44 @@ final class ImagesListService {
         }
     }
 
+    func changeLike(photoId: String, isLike: Bool, _ completion: @escaping (Result<Void, Error>) -> Void) {
+        guard let token = tokenStorage.token else {
+            assertionFailure("[ImagesListService] ❌ No token found")
+            completion(.failure(NSError(domain: "NoToken", code: 401)))
+            return
+        }
+
+        let method: NetworkClient.HTTPMethod = isLike ? .post : .delete
+        let request = NetworkClient.Endpoint(
+            path: "/photos/\(photoId)/like",
+            method: method,
+            headers: ["Authorization": "Bearer \(token)"]
+        )
+
+        print("[ImagesListService] \(isLike ? "POST" : "DELETE") /photos/\(photoId)/like")
+
+        _ = networkClient.objectTask(for: request) { [weak self] (result: Result<LikeResult, NetworkClient.NetworkError>) in
+            switch result {
+            case .success(let likeResult):
+                DispatchQueue.main.async {
+                    self?.updatePhotoModel(with: likeResult.photo)
+                    completion(.success(()))
+                    NotificationCenter.default.post(name: ImagesListService.didChangeNotification, object: self)
+                }
+            case .failure(let error):
+                print("[ImagesListService] ❌ Like change error: \(error.localizedDescription)")
+                completion(.failure(error))
+            }
+        }
+    }
+
+    private func updatePhotoModel(with updatedPhoto: PhotoResult) {
+        let updated = convert(updatedPhoto)
+        if let index = photos.firstIndex(where: { $0.id == updated.id }) {
+            photos[index] = updated
+        }
+    }
+
     private func convert(_ result: PhotoResult) -> Photo {
         let size = CGSize(width: result.width, height: result.height)
         let createdAtDate = result.createdAt.flatMap { dateFormatter.date(from: $0) }
