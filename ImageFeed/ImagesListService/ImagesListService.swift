@@ -9,6 +9,7 @@ import UIKit
 
 
 final class ImagesListService {
+    static let shared = ImagesListService()
     static let didChangeNotification = Notification.Name("ImagesListServiceDidChange")
 
     private(set) var photos: [Photo] = []
@@ -22,12 +23,10 @@ final class ImagesListService {
         return formatter
     }()
 
-    private let networkClient: NetworkClient
+    private let networkClient: NetworkClient = NetworkClient()
     private let tokenStorage = OAuth2TokenStorage()
 
-    init(networkClient: NetworkClient) {
-        self.networkClient = networkClient
-    }
+    private init() {}
 
     func fetchPhotosNextPage() {
         guard !isFetching else { return }
@@ -48,7 +47,6 @@ final class ImagesListService {
                 URLQueryItem(name: "page", value: String(nextPage)),
                 URLQueryItem(name: "per_page", value: "10")
             ]
-           
         )
 
         print("[ImagesListService] Fetching page \(nextPage)")
