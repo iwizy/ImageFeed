@@ -7,9 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		847566292DC94C0C0023B4A9 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 847566282DC94C0C0023B4A9 /* Kingfisher */; };
 		8475662C2DC960060023B4A9 /* SwiftKeychainWrapper in Frameworks */ = {isa = PBXBuildFile; productRef = 8475662B2DC960060023B4A9 /* SwiftKeychainWrapper */; };
 		8475667C2DCEA9A10023B4A9 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 84F21B002DAD26210097C940 /* WebKit.framework */; };
+		8489E8512DD67AD400211A85 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 8489E8502DD67AD400211A85 /* Kingfisher */; };
 		849D97492DBADC69009FAF45 /* ProgressHUD in Frameworks */ = {isa = PBXBuildFile; productRef = 849D97482DBADC69009FAF45 /* ProgressHUD */; };
 /* End PBXBuildFile section */
 
@@ -63,7 +63,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				847566292DC94C0C0023B4A9 /* Kingfisher in Frameworks */,
+				8489E8512DD67AD400211A85 /* Kingfisher in Frameworks */,
 				8475662C2DC960060023B4A9 /* SwiftKeychainWrapper in Frameworks */,
 				8475667C2DCEA9A10023B4A9 /* WebKit.framework in Frameworks */,
 				849D97492DBADC69009FAF45 /* ProgressHUD in Frameworks */,
@@ -135,8 +135,8 @@
 			name = ImageFeed;
 			packageProductDependencies = (
 				849D97482DBADC69009FAF45 /* ProgressHUD */,
-				847566282DC94C0C0023B4A9 /* Kingfisher */,
 				8475662B2DC960060023B4A9 /* SwiftKeychainWrapper */,
+				8489E8502DD67AD400211A85 /* Kingfisher */,
 			);
 			productName = ImageFeed;
 			productReference = 8402B3CA2D8CA7FC001842E4 /* ImageFeed.app */;
@@ -216,8 +216,8 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				849D97472DBADC69009FAF45 /* XCRemoteSwiftPackageReference "ProgressHUD" */,
-				847566272DC94C0C0023B4A9 /* XCRemoteSwiftPackageReference "Kingfisher" */,
 				8475662A2DC960060023B4A9 /* XCRemoteSwiftPackageReference "SwiftKeychainWrapper" */,
+				8489E84F2DD67AD400211A85 /* XCRemoteSwiftPackageReference "Kingfisher" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 8402B3CB2D8CA7FC001842E4 /* Products */;
@@ -588,20 +588,20 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		847566272DC94C0C0023B4A9 /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/onevcat/Kingfisher";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 8.3.2;
-			};
-		};
 		8475662A2DC960060023B4A9 /* XCRemoteSwiftPackageReference "SwiftKeychainWrapper" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/jrendel/SwiftKeychainWrapper";
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 4.0.1;
+			};
+		};
+		8489E84F2DD67AD400211A85 /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/onevcat/Kingfisher";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.3.2;
 			};
 		};
 		849D97472DBADC69009FAF45 /* XCRemoteSwiftPackageReference "ProgressHUD" */ = {
@@ -615,15 +615,15 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		847566282DC94C0C0023B4A9 /* Kingfisher */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 847566272DC94C0C0023B4A9 /* XCRemoteSwiftPackageReference "Kingfisher" */;
-			productName = Kingfisher;
-		};
 		8475662B2DC960060023B4A9 /* SwiftKeychainWrapper */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 8475662A2DC960060023B4A9 /* XCRemoteSwiftPackageReference "SwiftKeychainWrapper" */;
 			productName = SwiftKeychainWrapper;
+		};
+		8489E8502DD67AD400211A85 /* Kingfisher */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8489E84F2DD67AD400211A85 /* XCRemoteSwiftPackageReference "Kingfisher" */;
+			productName = Kingfisher;
 		};
 		849D97482DBADC69009FAF45 /* ProgressHUD */ = {
 			isa = XCSwiftPackageProductDependency;

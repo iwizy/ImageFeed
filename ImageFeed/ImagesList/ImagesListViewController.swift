@@ -48,6 +48,9 @@ final class ImagesListViewController: UIViewController {
             super.prepare(for: segue, sender: sender)
         }
     }
+    
+    
+    
 }
 
 // MARK: - Extensions
@@ -82,11 +85,19 @@ extension ImagesListViewController {
         let likeImage = isLiked ? UIImage(named: "like_on") : UIImage(named: "like_off")
         cell.likeButton.setImage(likeImage, for: .normal)
     }
+    
+    
+    func tableView(
+      _ tableView: UITableView,
+      willDisplay cell: UITableViewCell,
+      forRowAt indexPath: IndexPath
+    ) {
+        // ...
+    }
+    
 }
 
 extension ImagesListViewController: UITableViewDelegate {
-    
-    // MARK: TODO Метод будет реализован в будущих спринтах
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         performSegue(withIdentifier: showSingleImageSegueIdentifier, sender: indexPath)
     }
