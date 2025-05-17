@@ -75,13 +75,8 @@ final class ImagesListViewController: UIViewController {
             }
             
             let photo = photos[indexPath.row]
-            if let url = URL(string: photo.largeImageURL) {
-                viewController.loadViewIfNeeded()
-                viewController.imageView.kf.setImage(
-                    with: url,
-                    placeholder: UIImage(named: "stub")
-                )
-            }
+            viewController.fullImageURL = URL(string: photo.largeImageURL)
+            
         } else {
             super.prepare(for: segue, sender: sender)
         }
@@ -114,6 +109,11 @@ extension ImagesListViewController: UITableViewDelegate {
         if indexPath.row == photos.count - 1 {
             imagesListService.fetchPhotosNextPage()
         }
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        performSegue(withIdentifier: showSingleImageSegueIdentifier, sender: indexPath)
     }
 }
 
