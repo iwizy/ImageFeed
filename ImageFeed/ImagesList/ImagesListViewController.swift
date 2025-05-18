@@ -151,9 +151,6 @@ extension ImagesListViewController: ImagesListCellDelegate {
     }
 }
 
-
-
-
 // MARK: - Cell Configuration
 extension ImagesListViewController {
     private func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {

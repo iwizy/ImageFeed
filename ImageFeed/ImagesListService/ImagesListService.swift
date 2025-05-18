@@ -2,11 +2,9 @@
 //  ImagesListService.swift
 //  ImageFeed
 //
-//  Created by Alexander Agafonov on 15.05.2025.
-//
+//  Сервис получения списка изображений
 
 import UIKit
-
 
 final class ImagesListService {
     static let shared = ImagesListService()
@@ -27,7 +25,8 @@ final class ImagesListService {
     private let tokenStorage = OAuth2TokenStorage()
 
     private init() {}
-
+    
+    // Метод получения следующей страницы изображений
     func fetchPhotosNextPage() {
         guard !isFetching else { return }
         isFetching = true
@@ -52,7 +51,7 @@ final class ImagesListService {
         print("[ImagesListService] Fetching page \(nextPage)")
 
         currentTask = networkClient.objectTask(for: request) { [weak self] (result: Result<[PhotoResult], NetworkClient.NetworkError>) in
-            guard let self = self else { return }
+            guard let self else { return }
             self.isFetching = false
 
             switch result {
@@ -123,5 +122,11 @@ final class ImagesListService {
             largeImageURL: result.urls.full,
             isLiked: result.likedByUser
         )
+    }
+    
+    // Очистка всех изображений
+    func cleatImagesList() {
+        print("[ImagesListService] ➡️ Clear images list")
+        photos.removeAll()
     }
 }
