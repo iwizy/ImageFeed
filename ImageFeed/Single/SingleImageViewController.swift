@@ -45,7 +45,9 @@ final class SingleImageViewController: UIViewController {
         guard let url = fullImageURL else { return }
         UIBlockingProgressHUD.show()
 
-        imageView.kf.setImage(with: url) { [weak self] result in
+        imageView.kf.setImage(with: url,
+                              placeholder: UIImage(named: "image_single_placeholder")
+                            ) { [weak self] result in
             guard let self = self else { return }
             UIBlockingProgressHUD.dismiss()
 
