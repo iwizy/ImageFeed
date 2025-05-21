@@ -15,11 +15,7 @@ final class ImagesListService {
     private var isFetching = false
     private var currentTask: URLSessionTask?
 
-    private lazy var dateFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
-        return formatter
-    }()
+    private let dateFormatter = ISO8601DateFormatter()
 
     private let networkClient: NetworkClient = NetworkClient()
     private let tokenStorage = OAuth2TokenStorage()
@@ -66,7 +62,7 @@ final class ImagesListService {
                 }
 
             case .failure(let error):
-                print("[ImagesListService] ❌ Network error: \(error.localizedDescription)")
+                print("[ImagesListService.fetchPhotosNextPage]: ❌ Failure — \(error.localizedDescription), page: \(nextPage)")
             }
         }
     }
@@ -96,7 +92,7 @@ final class ImagesListService {
                     NotificationCenter.default.post(name: ImagesListService.didChangeNotification, object: self)
                 }
             case .failure(let error):
-                print("[ImagesListService] ❌ Like change error: \(error.localizedDescription)")
+                print("[ImagesListService.changeLike] ❌ Like change error: \(error.localizedDescription), photoId: \(photoId), method: \(method)")
                 completion(.failure(error))
             }
         }

@@ -53,15 +53,7 @@ final class ImagesListViewController: UIViewController {
     }
     
     @objc private func didReceivePhotosNotification() {
-        let oldCount = photos.count
-        photos = imagesListService.photos
-        let newCount = photos.count
-        guard newCount > oldCount else { return }
-        
-        tableView.performBatchUpdates {
-            let indexPaths = (oldCount..<newCount).map { IndexPath(row: $0, section: 0) }
-            tableView.insertRows(at: indexPaths, with: .automatic)
-        }
+        updateTableViewAnimated()
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -79,6 +71,19 @@ final class ImagesListViewController: UIViewController {
             
         } else {
             super.prepare(for: segue, sender: sender)
+        }
+    }
+    
+    private func updateTableViewAnimated() {
+        let oldCount = photos.count
+        let newCount = imagesListService.photos.count
+        guard oldCount != newCount else { return }
+
+        photos = imagesListService.photos
+
+        tableView.performBatchUpdates {
+            let indexPaths = (oldCount..<newCount).map { IndexPath(row: $0, section: 0) }
+            tableView.insertRows(at: indexPaths, with: .automatic)
         }
     }
 }

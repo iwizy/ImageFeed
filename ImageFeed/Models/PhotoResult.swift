@@ -2,8 +2,7 @@
 //  PhotoResult.swift
 //  ImageFeed
 //
-//  Created by Alexander Agafonov on 17.05.2025.
-//
+//  структуры для работы с результатами ответов
 
 import Foundation
 
