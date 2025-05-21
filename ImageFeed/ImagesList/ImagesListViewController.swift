@@ -46,12 +46,6 @@ final class ImagesListViewController: UIViewController {
         imagesListService.fetchPhotosNextPage()
     }
     
-    deinit {
-        if let observer = imagesListServiceObserver {
-            NotificationCenter.default.removeObserver(observer)
-        }
-    }
-    
     @objc private func didReceivePhotosNotification() {
         updateTableViewAnimated()
     }
@@ -84,6 +78,12 @@ final class ImagesListViewController: UIViewController {
         tableView.performBatchUpdates {
             let indexPaths = (oldCount..<newCount).map { IndexPath(row: $0, section: 0) }
             tableView.insertRows(at: indexPaths, with: .automatic)
+        }
+    }
+    
+    deinit {
+        if let observer = imagesListServiceObserver {
+            NotificationCenter.default.removeObserver(observer)
         }
     }
 }
@@ -134,7 +134,7 @@ extension ImagesListViewController: ImagesListCellDelegate {
             DispatchQueue.main.async {
                 UIBlockingProgressHUD.dismiss()
                 
-                guard let self = self else { return }
+                guard let self else { return }
                 
                 switch result {
                 case .success:
