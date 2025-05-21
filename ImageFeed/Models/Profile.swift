@@ -2,7 +2,7 @@
 //  Profile.swift
 //  ImageFeed
 //
-//  Сктруктура данных конечного вида профиля
+//  Структура данных конечного вида профиля
 
 struct Profile {
     let username: String?

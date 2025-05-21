@@ -57,4 +57,10 @@ final class ProfileService {
             }
         }
     }
+    
+    // Удаление данных профиля
+    func clearProfile() {
+        print("[ProfileService] ➡️ Clear profile data")
+        profile = nil
+    }
 }

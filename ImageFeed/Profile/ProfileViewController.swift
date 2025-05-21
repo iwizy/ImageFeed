@@ -11,6 +11,7 @@ final class ProfileViewController: UIViewController {
     // MARK: - Private Properties
     private let profileService = ProfileService.shared
     private let profileImageService = ProfileImageService.shared
+    private let profileLogoutService = ProfileLogoutService.shared
     
     private var profileResult: ProfileResult? {
         didSet {
@@ -113,6 +114,7 @@ final class ProfileViewController: UIViewController {
         view.addSubview(nameLabel)
         view.addSubview(loginNameLabel)
         view.addSubview(descriptionLabel)
+        logoutButton.addTarget(self, action: #selector(didTapLogoutButton), for: .touchUpInside)
     }
     
     private func setupConstraints() {
@@ -151,5 +153,25 @@ final class ProfileViewController: UIViewController {
         nameLabel.text = profile.name
         loginNameLabel.text = profile.loginName
         descriptionLabel.text = profile.bio
+    }
+    
+    @objc private func didTapLogoutButton() {
+        print("[ProfileViewController] ➡️ User tapped lougout button")
+        let alert = UIAlertController(
+            title: "Пока, пока!",
+            message: "Уверены, что хотите выйти?",
+            preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Нет", style: .default))
+        alert.addAction(UIAlertAction(title: "Да", style: .cancel) { [weak self] _ in
+            self?.profileLogoutService.logout()
+            self?.switchToSplash()
+        })
+        present(alert, animated: true)
+    }
+    
+    private func switchToSplash() {
+        print("[ProfileViewController] ➡️ Go to Splash Screen")
+        guard let window = UIApplication.shared.windows.first else { return }
+        window.rootViewController = SplashViewController()
     }
 }

@@ -25,9 +25,10 @@ final class OAuth2TokenStorage {
         self.token = newToken
     }
     
-    // Удаляет текущий токен из хранилища.
+    // Удаляет текущий токен из хранилища
     func clearToken() {
-        self.token = nil
+        print("[OAuth2TokenStorage] ➡️ Clear token data")
+        keychainWrapper.remove(forKey: "accessToken")
     }
     
     // MARK: - Private Methods
@@ -42,7 +43,7 @@ final class OAuth2TokenStorage {
     
     private(set) var token: String? {
         get {
-            // Получаем токен из стандартного хранилища UserDefaults
+            // Получаем токен из keychain
             let token = keychainWrapper.string(forKey: "accessToken")
             print("[TokenStorage] Retrieved token: \(token ?? "nil")")
             return token

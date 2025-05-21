@@ -71,6 +71,11 @@ final class ProfileImageService {
             }
         }
     }
+    
+    func clearProfileImage() {
+        print("[ProfileImageService] ➡️ Clear profile image data")
+        avatarURL = nil
+    }
 }
 
 // MARK: - Extensions: DidChangeNotification
