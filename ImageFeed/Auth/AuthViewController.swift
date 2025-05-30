@@ -59,6 +59,10 @@ final class AuthViewController: UIViewController {
                 fatalError("Failed to prepare for \(showWebViewSegueIdentifier)")
             }
             
+            let webViewPresenter = WebViewPresenter()
+            webViewViewController.presenter = webViewPresenter
+            webViewPresenter.view = webViewViewController
+            
             // Устанавливаем себя делегатом WebViewViewController
             webViewViewController.delegate = self
         } else {
