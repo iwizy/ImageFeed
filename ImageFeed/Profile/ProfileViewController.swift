@@ -7,7 +7,17 @@
 import UIKit
 import Kingfisher
 
-final class ProfileViewController: UIViewController {
+public protocol ProfileViewControllerProtocol: AnyObject {
+    var presenter: ProfilePresenterProtocol? { get set }
+    
+    func updateAvatar()
+    func updateProfileData()
+    
+}
+
+final class ProfileViewController: UIViewController & ProfileViewControllerProtocol {
+    var presenter: (any ProfilePresenterProtocol)?
+    
     // MARK: - Private Properties
     private let profileService = ProfileService.shared
     private let profileImageService = ProfileImageService.shared
@@ -97,7 +107,7 @@ final class ProfileViewController: UIViewController {
     }
     
     // MARK: - Private Methods
-    private func updateAvatar() {
+    func updateAvatar() {
         guard
             let profileImageURL = ProfileImageService.shared.avatarURL,
             let url = URL(string: profileImageURL)
@@ -144,7 +154,7 @@ final class ProfileViewController: UIViewController {
     }
     
     
-    private func updateProfileData() {
+    func updateProfileData() {
         guard let profile = profileService.profile else {
             print("Нет данных профиля для отображения")
             return
@@ -156,6 +166,11 @@ final class ProfileViewController: UIViewController {
     }
     
     @objc private func didTapLogoutButton() {
+        showLogoutAlert()
+    }
+    
+    
+    func showLogoutAlert() {
         print("[ProfileViewController] ➡️ User tapped lougout button")
         let alert = UIAlertController(
             title: "Пока, пока!",
@@ -163,15 +178,10 @@ final class ProfileViewController: UIViewController {
             preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Нет", style: .default))
         alert.addAction(UIAlertAction(title: "Да", style: .cancel) { [weak self] _ in
-            self?.profileLogoutService.logout()
-            self?.switchToSplash()
+            self?.presenter?.exitProfile()
         })
         present(alert, animated: true)
     }
     
-    private func switchToSplash() {
-        print("[ProfileViewController] ➡️ Go to Splash Screen")
-        guard let window = UIApplication.shared.windows.first else { return }
-        window.rootViewController = SplashViewController()
-    }
+    
 }
