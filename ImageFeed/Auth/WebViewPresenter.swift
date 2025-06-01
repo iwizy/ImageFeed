@@ -2,30 +2,23 @@
 //  WebViewPresenter.swift
 //  ImageFeed
 //
-//  WebView Presenter
+//  Перезнтер WebView
 
 import Foundation
 import WebKit
 
-public protocol WebViewPresenterProtocol {
-    var view: WebViewViewControllerProtocol? { get set }
-    func viewDidLoad()
-    func didUpdateProgressValue(_ newValue: Double)
-    func code(from url: URL) -> String?
-}
-
 final class WebViewPresenter: WebViewPresenterProtocol {
     
+    // MARK: - Public properties
     weak var view: WebViewViewControllerProtocol?
-    
     var authHelper: AuthHelperProtocol
     
     init(authHelper: AuthHelperProtocol) {
-            self.authHelper = authHelper
-        }
+        self.authHelper = authHelper
+    }
     
+    // MARK: - Lifecycle
     func viewDidLoad() {
-        
         guard let request = authHelper.authRequest() else { return }
         // Создаем компоненты URL из базового адреса авторизации
         guard var urlComponents = URLComponents(string: Constants.unsplashAuthorizeURLString) else {
@@ -53,6 +46,7 @@ final class WebViewPresenter: WebViewPresenterProtocol {
         didUpdateProgressValue(0)
     }
     
+    // MARK: - Public methods
     func code(from url: URL) -> String? {
         authHelper.code(from: url)
     }
@@ -68,7 +62,5 @@ final class WebViewPresenter: WebViewPresenterProtocol {
     func shouldHideProgress(for value: Float) -> Bool {
         abs(value - 1.0) <= 0.0001
     }
-    
-    
     
 }

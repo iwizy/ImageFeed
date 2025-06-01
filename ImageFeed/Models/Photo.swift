@@ -2,8 +2,7 @@
 //  Photo.swift
 //  ImageFeed
 //
-//  Created by Alexander Agafonov on 15.05.2025.
-//
+//  Модель фотографии
 
 import Foundation
 

@@ -74,6 +74,28 @@ final class ImagesListViewController: UIViewController, ImagesListViewProtocol {
     func reloadData() {
         tableView.reloadData()
     }
+    
+    func updateRow(at index: Int) {
+        tableView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
+    }
+
+    func showLoadingIndicator() {
+        UIBlockingProgressHUD.show()
+    }
+
+    func hideLoadingIndicator() {
+        UIBlockingProgressHUD.dismiss()
+    }
+
+    func showLikeError() {
+        let alert = UIAlertController(
+            title: "Ошибка",
+            message: "Не удалось изменить статус лайка. Попробуйте позже.",
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "ОК", style: .default))
+        present(alert, animated: true)
+    }
 }
 
 // MARK: - UITableViewDataSource
@@ -114,32 +136,7 @@ extension ImagesListViewController: UITableViewDelegate {
 extension ImagesListViewController: ImagesListCellDelegate {
     func imageListCellDidTapLike(_ cell: ImagesListCell) {
         guard let indexPath = tableView.indexPath(for: cell) else { return }
-        guard let photo = presenter?.photo(at: indexPath.row) else { return }
-        
-        UIBlockingProgressHUD.show()
-        
-        imagesListService.changeLike(photoId: photo.id, isLike: !photo.isLiked) { [weak self] result in
-            DispatchQueue.main.async {
-                UIBlockingProgressHUD.dismiss()
-                
-                guard let self else { return }
-                
-                switch result {
-                case .success:
-                    let updatedPhoto = self.imagesListService.photos[indexPath.row]
-                    cell.setIsLiked(updatedPhoto.isLiked)
-                    
-                case .failure:
-                    let alert = UIAlertController(
-                        title: "Ошибка",
-                        message: "Не удалось изменить статус лайка. Попробуйте позже.",
-                        preferredStyle: .alert
-                    )
-                    alert.addAction(UIAlertAction(title: "ОК", style: .default))
-                    self.present(alert, animated: true)
-                }
-            }
-        }
+        presenter?.didTapLike(at: indexPath.row)
     }
 }
 

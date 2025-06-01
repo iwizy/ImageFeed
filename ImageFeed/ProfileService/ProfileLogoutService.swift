@@ -9,20 +9,25 @@ import WebKit
 import Kingfisher
 
 final class ProfileLogoutService {
+    // MARK: - Public Properties
     static let shared = ProfileLogoutService()
     
-    private init() { }
-    
+    // MARK: - Private Properties
     private let imagesListService = ImagesListService.shared
     private let profileService = ProfileService.shared
     private let profileImageService = ProfileImageService.shared
     private let oAuth2TokenStorage = OAuth2TokenStorage()
     
+    // MARK: - Initializers
+    private init() { }
+    
+    // MARK: - Public Methods
     func logout() {
         clearCookies()
         clearAllData()
     }
     
+    // MARK: - Private Methods
     // Удаляем куки
     private func clearCookies() {
         print("[ProfileLogoutService] ➡️ Clear cookies")
@@ -33,7 +38,6 @@ final class ProfileLogoutService {
             }
         }
     }
-    
     
     private func clearAllData() {
         // очистка всех изображений
@@ -49,4 +53,3 @@ final class ProfileLogoutService {
         KingfisherManager.shared.cache.clearCache()
     }
 }
-

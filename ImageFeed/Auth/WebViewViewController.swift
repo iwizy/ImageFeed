@@ -7,22 +7,6 @@
 import UIKit
 import WebKit
 
-public protocol WebViewViewControllerProtocol: AnyObject {
-    var presenter: WebViewPresenterProtocol? { get set }
-    func load(request: URLRequest)
-    func setProgressValue(_ newValue: Float)
-    func setProgressHidden(_ isHidden: Bool)
-}
-
-// Протокол для обработки событий авторизации
-protocol WebViewViewControllerDelegate: AnyObject {
-    // Вызывается при успешной авторизации
-    func webViewViewController(_ vc: WebViewViewController, didAuthenticateWithCode code: String)
-    
-    // Вызывается при отмене авторизации
-    func webViewViewControllerDidCancel(_ vc: WebViewViewController)
-}
-
 // Контроллер для отображения веб-интерфейса авторизации через OAuth 2.0
 final class WebViewViewController: UIViewController & WebViewViewControllerProtocol {
     
