@@ -2,10 +2,9 @@
 //  WebViewViewControllerSpy.swift
 //  ImageFeed
 //
-//  Created by Alexander Agafonov on 31.05.2025.
-//
+//  Наблюдатель WebViewViewController
 
-import ImageFeed
+@testable import ImageFeed
 import Foundation
 
 final class WebViewViewControllerSpy: WebViewViewControllerProtocol {

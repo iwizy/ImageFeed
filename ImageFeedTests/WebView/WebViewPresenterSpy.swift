@@ -2,10 +2,9 @@
 //  WebViewPresenterSpy.swift
 //  ImageFeed
 //
-//  Created by Alexander Agafonov on 31.05.2025.
-//
+//  Наблюдатель WebViewPresenter
 
-import ImageFeed
+@testable import ImageFeed
 import Foundation
 
 final class WebViewPresenterSpy: WebViewPresenterProtocol {
