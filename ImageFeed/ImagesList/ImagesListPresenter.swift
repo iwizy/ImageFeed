@@ -38,7 +38,6 @@ final class ImagesListPresenter: ImagesListPresenterProtocol {
 
         guard newCount > oldCount else {
             photos = newPhotos
-            view?.reloadData() 
             return
         }
 
@@ -64,23 +63,17 @@ final class ImagesListPresenter: ImagesListPresenterProtocol {
 
                 switch result {
                 case .success:
-                    let updatedPhoto = Photo(
-                        id: photo.id,
-                        size: photo.size,
-                        createdAt: photo.createdAt,
-                        welcomeDescription: photo.welcomeDescription,
-                        thumbImageURL: photo.thumbImageURL,
-                        largeImageURL: photo.largeImageURL,
-                        isLiked: !photo.isLiked
-                    )
-                    self.photos[index] = updatedPhoto
-                    self.view?.updateRow(at: index)
+                    if let updatedPhoto = self.imagesListService.photos.first(where: { $0.id == photo.id }) {
+                        self.photos[index] = updatedPhoto
+                        self.view?.updateRow(at: index)
+                    }
                 case .failure:
                     self.view?.showLikeError()
                 }
             }
         }
     }
+
     
     deinit {
         NotificationCenter.default.removeObserver(self)

@@ -30,6 +30,7 @@ final class WebViewViewController: UIViewController & WebViewViewControllerProto
         // Настраиваем WebView
         webView.navigationDelegate = self  // Устанавливаем себя делегатом навигации
         presenter?.viewDidLoad()
+        webView.accessibilityIdentifier = "UnsplashWebView"
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -69,8 +70,6 @@ final class WebViewViewController: UIViewController & WebViewViewControllerProto
 // MARK: - Extensions
 
 extension WebViewViewController: WKNavigationDelegate {
-    
-    // Определяет политику обработки навигационных действий
     func webView(
         _ webView: WKWebView,
         decidePolicyFor navigationAction: WKNavigationAction,

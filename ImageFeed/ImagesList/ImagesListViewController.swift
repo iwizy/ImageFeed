@@ -63,30 +63,37 @@ final class ImagesListViewController: UIViewController, ImagesListViewProtocol {
             super.prepare(for: segue, sender: sender)
         }
     }
-
+    
     // MARK: - ImagesListViewProtocol
     func insertRows(at indexPaths: [IndexPath]) {
         tableView.performBatchUpdates {
             tableView.insertRows(at: indexPaths, with: .automatic)
         }
     }
-
+    
     func reloadData() {
         tableView.reloadData()
     }
     
     func updateRow(at index: Int) {
-        tableView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
+        let indexPath = IndexPath(row: index, section: 0)
+        guard let cell = tableView.cellForRow(at: indexPath) as? ImagesListCell,
+              let photo = presenter?.photo(at: index) else { return }
+        
+        cell.setIsLiked(photo.isLiked)
     }
-
+    
+    
+    
+    
     func showLoadingIndicator() {
         UIBlockingProgressHUD.show()
     }
-
+    
     func hideLoadingIndicator() {
         UIBlockingProgressHUD.dismiss()
     }
-
+    
     func showLikeError() {
         let alert = UIAlertController(
             title: "Ошибка",
@@ -150,9 +157,11 @@ extension ImagesListViewController {
             cell.cellImage.kf.setImage(
                 with: url,
                 placeholder: UIImage(named: "images_list_placeholder")
-            ) { [weak self] _ in
-                self?.tableView.beginUpdates()
-                self?.tableView.endUpdates()
+            ) { [weak self] result in
+                if case .success(let value) = result, value.cacheType == .none {
+                    self?.tableView.beginUpdates()
+                    self?.tableView.endUpdates()
+                }
             }
         }
         
@@ -161,8 +170,7 @@ extension ImagesListViewController {
         } else {
             cell.dateLabel.text = ""
         }
-        
-        let likeImage = photo.isLiked ? UIImage(named: "like_on") : UIImage(named: "like_off")
-        cell.likeButton.setImage(likeImage, for: .normal)
+        cell.setIsLiked(photo.isLiked)
     }
+    
 }

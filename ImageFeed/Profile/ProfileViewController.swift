@@ -29,6 +29,7 @@ final class ProfileViewController: UIViewController, ProfileViewControllerProtoc
         button.setImage(UIImage(named: "logout_button"), for: .normal)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.tintColor = UIColor(named: "YP Red")
+        button.accessibilityIdentifier = "logoutButton"
         return button
     }()
     
@@ -37,6 +38,7 @@ final class ProfileViewController: UIViewController, ProfileViewControllerProtoc
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textColor = UIColor(named: "YP White")
         label.font = UIFont.systemFont(ofSize: 23, weight: .bold)
+        label.accessibilityIdentifier = "nameLabel"
         return label
     }()
     
@@ -45,6 +47,7 @@ final class ProfileViewController: UIViewController, ProfileViewControllerProtoc
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textColor = UIColor(named: "YP Gray")
         label.font = UIFont.systemFont(ofSize: 13, weight: .regular)
+        label.accessibilityIdentifier = "loginNameLabel"
         return label
     }()
     

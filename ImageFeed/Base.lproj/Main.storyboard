@@ -39,6 +39,7 @@
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="dNb-HV-3WP">
                                 <rect key="frame" x="16" y="646" width="361" height="48"/>
                                 <color key="backgroundColor" name="YP White"/>
+                                <accessibility key="accessibilityConfiguration" identifier="Authenticate"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="48" id="nI7-GX-yi8"/>
                                 </constraints>
@@ -197,6 +198,7 @@
                             </scrollView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="uw9-lR-q0v" userLabel="Backward Button">
                                 <rect key="frame" x="8" y="67" width="44" height="44"/>
+                                <accessibility key="accessibilityConfiguration" identifier="nav_button_back"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="44" id="PNz-z6-27s"/>
                                     <constraint firstAttribute="height" constant="44" id="rV2-s4-He8"/>
