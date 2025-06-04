@@ -30,7 +30,7 @@ final class ProfileService {
     // MARK: - Initializers
     private init() {}
     
-    // MARK: - Private Methods
+    // MARK: - Public Methods
     func fetchProfile(_ token: String, completion: @escaping (Result<Profile, Error>) -> Void) {
         print("[ProfileService] Using token: \(token)")
         assert(Thread.isMainThread)

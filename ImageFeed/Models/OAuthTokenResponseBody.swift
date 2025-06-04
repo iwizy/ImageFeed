@@ -2,7 +2,7 @@
 //  OAuthTokenResponseBody.swift
 //  ImageFeed
 //
-// Структура данных токена
+// Модель данных токена
 
 import Foundation
 

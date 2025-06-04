@@ -2,7 +2,7 @@
 //  ProfileResult.swift
 //  ImageFeed
 //
-//  Структура данных полученного профиля
+//  Модель данных полученного профиля
 
 import Foundation
 

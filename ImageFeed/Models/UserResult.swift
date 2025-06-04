@@ -2,7 +2,7 @@
 //  UserResult.swift
 //  ImageFeed
 //
-//  Структура данных изображения профиля
+//  Модель данных изображения профиля
 
 struct UserResult: Decodable {
     let profileImage: UserImage?

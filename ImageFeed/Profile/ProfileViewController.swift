@@ -7,23 +7,12 @@
 import UIKit
 import Kingfisher
 
-final class ProfileViewController: UIViewController {
+final class ProfileViewController: UIViewController, ProfileViewControllerProtocol {
+    
+    // MARK: - Public Properties
+    var presenter: ProfilePresenterProtocol?
+    
     // MARK: - Private Properties
-    private let profileService = ProfileService.shared
-    private let profileImageService = ProfileImageService.shared
-    private let profileLogoutService = ProfileLogoutService.shared
-    
-    private var profileResult: ProfileResult? {
-        didSet {
-            updateProfileData()
-        }
-    }
-    
-    private var currentProfile: Profile? {
-        guard let profileResult = profileResult else { return nil }
-        return Profile(ProfileResult: profileResult)
-    }
-    
     private var profileImageServiceObserver: NSObjectProtocol?
     
     // UI Elements
@@ -40,74 +29,72 @@ final class ProfileViewController: UIViewController {
         button.setImage(UIImage(named: "logout_button"), for: .normal)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.tintColor = UIColor(named: "YP Red")
+        button.accessibilityIdentifier = "logoutButton"
         return button
     }()
     
     private let nameLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.text = "Имя Фамилия" // Временное значение
         label.textColor = UIColor(named: "YP White")
         label.font = UIFont.systemFont(ofSize: 23, weight: .bold)
+        label.accessibilityIdentifier = "nameLabel"
         return label
     }()
     
     private let loginNameLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.text = "@username" // Временное значение
         label.textColor = UIColor(named: "YP Gray")
         label.font = UIFont.systemFont(ofSize: 13, weight: .regular)
+        label.accessibilityIdentifier = "loginNameLabel"
         return label
     }()
     
     private let descriptionLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.text = "Описание профиля" // Временное значение
         label.textColor = UIColor(named: "YP White")
         label.font = UIFont.systemFont(ofSize: 13, weight: .regular)
         return label
     }()
     
-    // MARK: - Initializers
-    deinit {
-        if let observer = profileImageServiceObserver {
-            NotificationCenter.default.removeObserver(observer)
-        }
-    }
-    
-    // MARK: - Overrides Methods
+    // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor(named: "YP Black")
         setupViews()
         setupConstraints()
-        updateProfileData()
-        profileImageServiceObserver = NotificationCenter.default
-            .addObserver(
-                forName: ProfileImageService.DidChangeNotification,
-                object: nil,
-                queue: .main
-            ) { [weak self] _ in
-                guard let self = self else { return }
-                self.updateAvatar()
-            }
-        updateAvatar()
+        presenter?.viewDidLoad()
+        
+        profileImageServiceObserver = NotificationCenter.default.addObserver(
+            forName: ProfileImageService.DidChangeNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.updateAvatar()
+        }
+    }
+    
+    // MARK: - Public Methods
+    @objc func didTapLogoutButton() {
+        showLogoutAlert()
+    }
+    
+    func updateProfileData() {
+        nameLabel.text = presenter?.profileName
+        loginNameLabel.text = presenter?.profileLoginName
+        descriptionLabel.text = presenter?.profileBio
+    }
+    
+    func updateAvatar() {
+        guard let url = presenter?.avatarURL else { return }
+        profileImage.kf.indicatorType = .activity
+        profileImage.kf.setImage(with: url, placeholder: UIImage(named: "profile_image_placeholder"))
     }
     
     // MARK: - Private Methods
-    private func updateAvatar() {
-        guard
-            let profileImageURL = ProfileImageService.shared.avatarURL,
-            let url = URL(string: profileImageURL)
-        else { return }
-        profileImage.kf.indicatorType = .activity
-        profileImage.kf.setImage(with: url,
-                                 placeholder: UIImage(named: "profile_image_placeholder"))
-        
-    }
-    
+    // UI Setup
     private func setupViews() {
         view.addSubview(profileImage)
         view.addSubview(logoutButton)
@@ -143,35 +130,23 @@ final class ProfileViewController: UIViewController {
         ])
     }
     
-    
-    private func updateProfileData() {
-        guard let profile = profileService.profile else {
-            print("Нет данных профиля для отображения")
-            return
-        }
-        
-        nameLabel.text = profile.name
-        loginNameLabel.text = profile.loginName
-        descriptionLabel.text = profile.bio
-    }
-    
-    @objc private func didTapLogoutButton() {
-        print("[ProfileViewController] ➡️ User tapped lougout button")
+    private func showLogoutAlert() {
+        print("[ProfileViewController] ➡️ User tapped logout button")
         let alert = UIAlertController(
             title: "Пока, пока!",
             message: "Уверены, что хотите выйти?",
-            preferredStyle: .alert)
+            preferredStyle: .alert
+        )
         alert.addAction(UIAlertAction(title: "Нет", style: .default))
         alert.addAction(UIAlertAction(title: "Да", style: .cancel) { [weak self] _ in
-            self?.profileLogoutService.logout()
-            self?.switchToSplash()
+            self?.presenter?.exitProfile()
         })
         present(alert, animated: true)
     }
     
-    private func switchToSplash() {
-        print("[ProfileViewController] ➡️ Go to Splash Screen")
-        guard let window = UIApplication.shared.windows.first else { return }
-        window.rootViewController = SplashViewController()
+    deinit {
+        if let observer = profileImageServiceObserver {
+            NotificationCenter.default.removeObserver(observer)
+        }
     }
 }

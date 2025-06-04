@@ -39,6 +39,7 @@
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="dNb-HV-3WP">
                                 <rect key="frame" x="16" y="646" width="361" height="48"/>
                                 <color key="backgroundColor" name="YP White"/>
+                                <accessibility key="accessibilityConfiguration" identifier="Authenticate"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="48" id="nI7-GX-yi8"/>
                                 </constraints>
@@ -197,6 +198,7 @@
                             </scrollView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="uw9-lR-q0v" userLabel="Backward Button">
                                 <rect key="frame" x="8" y="67" width="44" height="44"/>
+                                <accessibility key="accessibilityConfiguration" identifier="nav_button_back"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="44" id="PNz-z6-27s"/>
                                     <constraint firstAttribute="height" constant="44" id="rV2-s4-He8"/>
@@ -247,7 +249,7 @@
         <!--WebViewViewController-->
         <scene sceneID="wdR-Gy-y1m">
             <objects>
-                <viewController title="WebViewViewController" modalPresentationStyle="fullScreen" id="nIk-1C-utQ" customClass="WebViewViewController" customModule="ImageFeed" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="WebViewViewController" title="WebViewViewController" modalPresentationStyle="fullScreen" id="nIk-1C-utQ" customClass="WebViewViewController" customModule="ImageFeed" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="e5l-vi-siG">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
