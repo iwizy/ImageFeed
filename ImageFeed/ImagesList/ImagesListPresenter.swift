@@ -4,7 +4,7 @@
 //
 //  Презентер ленты фотографий
 
-import UIKit
+import Foundation
 
 final class ImagesListPresenter: ImagesListPresenterProtocol {
     

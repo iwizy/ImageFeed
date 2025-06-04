@@ -5,7 +5,7 @@
 
 import XCTest
 
-class Image_FeedUITests: XCTestCase {
+final class Image_FeedUITests: XCTestCase {
     // Экземпляр приложения, с которым будут выполняться UI-тесты
     private let app = XCUIApplication()
 
